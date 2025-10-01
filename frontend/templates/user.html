@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3 class="mb-3">Thư viện</h3>
+
+<h5>Sách hiện có</h5>
+<table class="table table-striped">
+  <thead><tr><th>ID</th><th>Tên</th><th>Tác giả</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+  <tbody>
+    {% for b in books %}
+    <tr>
+      <td>{{ b.id }}</td>
+      <td>{{ b.title }}</td>
+      <td>{{ b.author }}</td>
+      <td>{{ 'Có sẵn' if b.available else 'Đang mượn' }}</td>
+      <td>
+        {% if b.available %}
+        <button class="btn btn-sm btn-primary" onclick="borrow({{ b.id }})">Mượn</button>
+        {% else %}
+        <button class="btn btn-sm btn-secondary" disabled>Không khả dụng</button>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+ </table>
+
+<h5 class="mt-4">Sách đã mượn</h5>
+<table class="table table-bordered">
+  <thead><tr><th>Mã mượn</th><th>ID sách</th><th>Hành động</th></tr></thead>
+  <tbody>
+    {% for br in my_borrows %}
+    <tr>
+      <td>{{ br.id }}</td>
+      <td>{{ br.book_id }}</td>
+      <td><button class="btn btn-sm btn-success" onclick="returnBook({{ br.id }})">Trả</button></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+ </table>
+
+<script>
+async function borrow(id) {
+  const res = await axios.post(`/user/borrow/${id}`);
+  if (res.data.ok) location.reload();
+}
+async function returnBook(borrowId) {
+  const res = await axios.post(`/user/return/${borrowId}`);
+  if (res.data.ok) location.reload();
+}
+</script>
+{% endblock %}
+
+

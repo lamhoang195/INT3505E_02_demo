@@ -1,0 +1,22 @@
+{
+  "books": [
+    {
+      "id": 1,
+      "title": "Tuổi trẻ đáng giá bao nhiêu",
+      "author": "Rosie Nguyễn",
+      "available": true
+    },
+    {
+      "id": 2,
+      "title": "Nhà giả kim",
+      "author": "Paulo Coelho",
+      "available": true
+    },
+    {
+      "id": 3,
+      "title": "Python",
+      "author": "Lam",
+      "available": true
+    }
+  ]
+}

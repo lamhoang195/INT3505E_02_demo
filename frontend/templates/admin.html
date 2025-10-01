@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3 class="mb-3">Quản trị sách</h3>
+<div class="card mb-4">
+  <div class="card-body">
+    <form id="createBookForm" class="row g-2">
+      <div class="col-md-5"><input class="form-control" name="title" placeholder="Tên sách" required /></div>
+      <div class="col-md-5"><input class="form-control" name="author" placeholder="Tác giả" required /></div>
+      <div class="col-md-2 d-grid"><button class="btn btn-primary" type="submit">Thêm</button></div>
+    </form>
+  </div>
+ </div>
+
+<h5>Danh sách sách</h5>
+<table class="table table-striped">
+  <thead><tr><th>ID</th><th>Tên</th><th>Tác giả</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+  <tbody id="booksTbody">
+    {% for b in books %}
+    <tr data-id="{{ b.id }}">
+      <td>{{ b.id }}</td>
+      <td><input class="form-control form-control-sm title" value="{{ b.title }}" /></td>
+      <td><input class="form-control form-control-sm author" value="{{ b.author }}" /></td>
+      <td>{{ 'Có sẵn' if b.available else 'Đang mượn' }}</td>
+      <td>
+        <button class="btn btn-sm btn-success me-1" onclick="updateBook({{ b.id }})">Lưu</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteBook({{ b.id }})">Xóa</button>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+ </table>
+
+<h5 class="mt-4">Quản lý mượn sách</h5>
+<table class="table table-bordered">
+  <thead><tr><th>Mã</th><th>Sách</th><th>Người mượn</th><th>Hành động</th></tr></thead>
+  <tbody>
+    {% for br in borrows %}
+    <tr>
+      <td>{{ br.id }}</td>
+      <td>{{ br.book_id }}</td>
+      <td>{{ br.username }}</td>
+      <td><button class="btn btn-sm btn-outline-danger" onclick="deleteBorrow({{ br.id }})">Xóa</button></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+ </table>
+
+<script>
+const form = document.getElementById('createBookForm');
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fd = new FormData(form);
+  const payload = { title: fd.get('title'), author: fd.get('author') };
+  const res = await axios.post('/admin/books', payload);
+  if (res.data.ok) location.reload();
+});
+
+async function updateBook(id) {
+  const tr = document.querySelector(`tr[data-id="${id}"]`);
+  const title = tr.querySelector('.title').value;
+  const author = tr.querySelector('.author').value;
+  const res = await axios.put(`/admin/books/${id}`, { title, author });
+  if (res.data.ok) location.reload();
+}
+
+async function deleteBook(id) {
+  const res = await axios.delete(`/admin/books/${id}`);
+  if (res.data.ok) location.reload();
+}
+
+async function deleteBorrow(id) {
+  const res = await axios.delete(`/admin/borrows/${id}`);
+  if (res.data.ok) location.reload();
+}
+</script>
+{% endblock %}
+
+
