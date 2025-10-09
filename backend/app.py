@@ -1,74 +1,148 @@
-from flask import Flask, render_template, redirect, request, session, url_for
-from werkzeug.security import generate_password_hash, check_password_hash
-import os
-from functools import wraps
-from .storage import read_json, write_json, ensure_parent_dir
+"""
+Main Flask Application
+Registers all API versions
+"""
+from flask import Flask, render_template
+from flask_cors import CORS
+from flasgger import Swagger
 
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(BASE_DIR, "data")
-USERS_PATH = os.path.join(DATA_DIR, "users.json")
-BOOKS_PATH = os.path.join(DATA_DIR, "books.json")
-BORROWS_PATH = os.path.join(DATA_DIR, "borrows.json")
-
+# Import V1 API blueprints
+from backend.api.v1.books import books_v1
+from backend.api.v1.users import users_v1
+from backend.api.v1.borrows import borrows_v1
 
 def create_app():
-    app = Flask(__name__, template_folder=os.path.join(os.path.dirname(BASE_DIR), "frontend", "templates"))
-    app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret-change-me")
-
-    # Seed data files if missing
-    ensure_parent_dir(USERS_PATH)
-    read_json(USERS_PATH, {"users": []})
-    read_json(BOOKS_PATH, {"books": []})
-    read_json(BORROWS_PATH, {"borrows": []})
-
-    # Ensure an initial admin exists
-    users = read_json(USERS_PATH, {"users": []})
-    if not any(u.get("role") == "admin" for u in users.get("users", [])):
-        users["users"].append({
-            "username": "admin",
-            "password_hash": generate_password_hash("admin123"),
-            "role": "admin"
-        })
-        write_json(USERS_PATH, users)
-
-    from .auth.routes import auth_bp
-    from .admin.routes import admin_bp
-    from .user.routes import user_bp
-
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(admin_bp, url_prefix="/admin")
-    app.register_blueprint(user_bp, url_prefix="/user")
-
-    @app.route("/")
+    """Create and configure Flask application"""
+    app = Flask(__name__, 
+                template_folder='../frontend/templates',
+                static_folder='../frontend/static')
+    
+    # Enable CORS for API requests
+    CORS(app)
+    
+    # Configure app
+    app.config['JSON_AS_ASCII'] = False
+    app.config['SECRET_KEY'] = 'your-secret-key-here'
+    
+    # Configure Swagger/OpenAPI
+    swagger_config = {
+        "headers": [],
+        "specs": [
+            {
+                "endpoint": 'apispec',
+                "route": '/apispec.json',
+                "rule_filter": lambda rule: True,
+                "model_filter": lambda tag: True,
+            }
+        ],
+        "static_url_path": "/flasgger_static",
+        "swagger_ui": True,
+        "specs_route": "/api/docs"
+    }
+    
+    swagger_template = {
+        "swagger": "2.0",
+        "info": {
+            "title": "Library Management System API",
+            "description": "RESTful API cho hệ thống quản lý sách với kiến trúc phân tầng theo nguyên tắc REST",
+            "version": "1.0.0",
+            "contact": {
+                "name": "API Support",
+                "url": "http://localhost:5000"
+            }
+        },
+        "host": "localhost:5000",
+        "basePath": "/",
+        "schemes": ["http"],
+        "tags": [
+            {
+                "name": "V1 - Books",
+                "description": "API V1 - Quản lý sách (Client-Server)"
+            },
+            {
+                "name": "V1 - Users",
+                "description": "API V1 - Quản lý người dùng (Client-Server)"
+            },
+            {
+                "name": "V1 - Authentication",
+                "description": "API V1 - Xác thực người dùng (Client-Server)"
+            },
+            {
+                "name": "V1 - Borrows",
+                "description": "API V1 - Quản lý mượn trả sách (Client-Server)"
+            }
+        ],
+        "securityDefinitions": {
+            "Bearer": {
+                "type": "apiKey",
+                "name": "Authorization",
+                "in": "header",
+                "description": "JWT Authorization header. Example: 'Bearer {token}'"
+            }
+        }
+    }
+    
+    Swagger(app, config=swagger_config, template=swagger_template)
+    
+    # Register V1 API blueprints
+    app.register_blueprint(books_v1)
+    app.register_blueprint(users_v1)
+    app.register_blueprint(borrows_v1)
+    
+    # Frontend routes
+    @app.route('/')
     def index():
-        if session.get("role") == "admin":
-            return redirect(url_for("admin.dashboard"))
-        if session.get("role") == "user":
-            return redirect(url_for("user.dashboard"))
-        return redirect(url_for("auth.login"))
-
+        """Home page"""
+        return render_template('index.html')
+    
+    @app.route('/login')
+    def login_page():
+        """Login page"""
+        return render_template('login.html')
+    
+    @app.route('/register')
+    def register_page():
+        """Register page"""
+        return render_template('register.html')
+    
+    @app.route('/dashboard')
+    def dashboard():
+        """User dashboard"""
+        return render_template('dashboard.html')
+    
+    @app.route('/admin')
+    def admin():
+        """Admin dashboard"""
+        return render_template('admin.html')
+    
+    # API info endpoint
+    @app.route('/api')
+    def api_info():
+        """API information"""
+        return {
+            'name': 'Library Management System API',
+            'description': 'RESTful API demonstrating REST architectural constraints',
+            'version': 'v1',
+            'status': 'active',
+            'description_detail': 'Client-Server architecture',
+            'base_url': '/api/v1',
+            'constraints': ['Client-Server'],
+            'endpoints': {
+                'books': '/api/v1/books',
+                'users': '/api/v1/users',
+                'borrows': '/api/v1/borrows',
+                'auth': '/api/v1/auth/login'
+            },
+            '_links': {
+                'self': {'href': '/api'},
+                'documentation': {'href': '/api/docs'},
+                'openapi-spec': {'href': '/apispec.json'}
+            }
+        }
+    
     return app
 
-
-def login_required(role=None):
-    def decorator(fn):
-        @wraps(fn)
-        def wrapper(*args, **kwargs):
-            if not session.get("username"):
-                return redirect(url_for("auth.login"))
-            if role and session.get("role") != role:
-                return redirect(url_for("auth.login"))
-            return fn(*args, **kwargs)
-        return wrapper
-    return decorator
-
-
-# Expose paths for other modules
-DATA_PATHS = {
-    "USERS_PATH": USERS_PATH,
-    "BOOKS_PATH": BOOKS_PATH,
-    "BORROWS_PATH": BORROWS_PATH,
-}
-
+if __name__ == '__main__':
+    app = create_app()
+    app.run(debug=True, host='0.0.0.0', port=5000)
 

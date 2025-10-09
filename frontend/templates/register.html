@@ -1,29 +1,72 @@
-{% extends 'base.html' %}
-{% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-5">
-    <h3 class="mb-3">Đăng ký</h3>
-    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
-    <form method="post">
-      <div class="mb-3">
-        <label class="form-label">Tên đăng nhập</label>
-        <input class="form-control" name="username" required />
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Mật khẩu</label>
-        <input class="form-control" type="password" name="password" required />
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Vai trò</label>
-        <select class="form-select" name="role">
-          <option value="user" selected>user</option>
-          <option value="admin">admin</option>
-        </select>
-      </div>
-      <button class="btn btn-success w-100" type="submit">Tạo tài khoản</button>
-    </form>
-  </div>
- </div>
-{% endblock %}
+{% extends "base.html" %}
 
+{% block title %}Đăng ký{% endblock %}
+
+{% block header %}Đăng ký tài khoản{% endblock %}
+
+{% block content %}
+<div class="nav">
+    <a href="/">Trang chủ</a>
+    <a href="/login">Đăng nhập</a>
+</div>
+
+<div class="card" style="max-width: 500px; margin: 0 auto;">
+    <h3>Tạo tài khoản mới</h3>
+    
+    <form id="registerForm" onsubmit="handleRegister(event)">
+        <div class="form-group">
+            <label for="username">Tên đăng nhập:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Mật khẩu:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="full_name">Họ tên:</label>
+            <input type="text" id="full_name" name="full_name" required>
+        </div>
+        
+        <button type="submit" class="btn">Đăng ký</button>
+    </form>
+</div>
+
+<script>
+async function handleRegister(event) {
+    event.preventDefault();
+    
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const full_name = document.getElementById('full_name').value;
+    
+    try {
+        const result = await apiCall('/users', 'POST', {
+            username,
+            password,
+            full_name,
+            role: 'user'
+        });
+        
+        showAlert('Đăng ký thành công! Đang chuyển đến trang đăng nhập...', 'success');
+        
+        setTimeout(() => {
+            window.location.href = '/login';
+        }, 2000);
+        
+    } catch (error) {
+        showAlert(error.message, 'error');
+    }
+}
+
+// Check if already logged in
+window.onload = function() {
+    const user = getCurrentUser();
+    if (user) {
+        window.location.href = user.role === 'admin' ? '/admin' : '/dashboard';
+    }
+};
+</script>
+{% endblock %}
 

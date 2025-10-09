@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Trang chủ - Hệ thống quản lý sách{% endblock %}
+
+{% block header %}Chào mừng đến với Hệ thống quản lý sách{% endblock %}
+
+{% block content %}
+<div class="nav">
+    <a href="/login">Đăng nhập</a>
+    <a href="/register">Đăng ký</a>
+    <a href="/api/docs" target="_blank">📚 API Documentation</a>
+</div>
+
+<div class="card">
+    <h3>Giới thiệu</h3>
+    <p>Hệ thống quản lý sách RESTful API với kiến trúc phân tầng theo các nguyên tắc REST.</p>
+    <p><strong>API tuân thủ nguyên tắc Client-Server Architecture:</strong></p>
+    <ul>
+        <li>Tách biệt rõ ràng giữa Client (Frontend) và Server (Backend API)</li>
+        <li>Client gửi HTTP requests đến Server</li>
+        <li>Server xử lý logic và trả về JSON responses</li>
+        <li>Client và Server phát triển độc lập</li>
+    </ul>
+</div>
+
+<div class="card">
+    <h3>Các chức năng</h3>
+    <ul>
+        <li>📚 Quản lý sách (CRUD)</li>
+        <li>👥 Quản lý người dùng</li>
+        <li>📖 Mượn và trả sách</li>
+        <li>📊 Xem lịch sử mượn trả</li>
+    </ul>
+</div>
+
+<div class="card">
+    <h3>Demo API</h3>
+    <button class="btn" onclick="testAPI()">Test API Connection</button>
+    <a href="/api/docs" target="_blank" class="btn" style="margin-left: 10px; display: inline-block;">Mở Swagger UI</a>
+    <div id="apiResult" style="margin-top: 15px;"></div>
+</div>
+
+<div class="card">
+    <h3>📚 OpenAPI/Swagger Documentation</h3>
+    <p>Hệ thống tích hợp Swagger UI để bạn có thể:</p>
+    <ul>
+        <li>Xem tất cả API endpoints với mô tả chi tiết</li>
+        <li>Test API trực tiếp trên trình duyệt</li>
+        <li>Xem request/response schema và examples</li>
+        <li>Download OpenAPI specification cho Postman</li>
+    </ul>
+    <p style="margin-top: 15px;">
+        <strong>Truy cập:</strong> 
+        <a href="/api/docs" target="_blank" style="color: #667eea;">http://localhost:5000/api/docs</a>
+    </p>
+</div>
+
+<script>
+async function testAPI() {
+    const resultDiv = document.getElementById('apiResult');
+    resultDiv.innerHTML = '<div class="loading">Đang kiểm tra kết nối...</div>';
+    
+    try {
+        const response = await fetch('http://localhost:5000/api');
+        const data = await response.json();
+        
+        resultDiv.innerHTML = `
+            <div class="alert alert-success">
+                <strong>Kết nối thành công!</strong><br>
+                API Name: ${data.name}<br>
+                Version: ${data.version}<br>
+                Description: ${data.description_detail}
+            </div>
+        `;
+    } catch (error) {
+        resultDiv.innerHTML = `
+            <div class="alert alert-error">
+                <strong>Lỗi kết nối!</strong><br>
+                ${error.message}<br>
+                Vui lòng đảm bảo server đang chạy tại http://localhost:5000
+            </div>
+        `;
+    }
+}
+
+// Check if user is logged in
+window.onload = function() {
+    const user = getCurrentUser();
+    if (user) {
+        window.location.href = user.role === 'admin' ? '/admin' : '/dashboard';
+    }
+};
+</script>
+{% endblock %}
+

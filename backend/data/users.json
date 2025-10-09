@@ -1,14 +1,16 @@
-{
-  "users": [
-    {
-      "username": "admin",
-      "password_hash": "scrypt:32768:8:1$Gb3qKtyGRQJs8Cc1$d5eafcd9cbb73dec2717ad9ce07d59b67ef9efaf01d412e15985c56bbbb1cc60c0eb921b7400da64f8eae473614eaca9f5322c50b941e0aab0dc1ed44f64e533",
-      "role": "admin"
-    },
-    {
-      "username": "lamhoang",
-      "password_hash": "scrypt:32768:8:1$spgniIS1zGhfL3KZ$28ca725e7130111d6e3ee6fdf462e627e7813d2bf3dabe22eb8a725bfbde5a360190b9fb4e0308c30be877f1ad2d8e043fe58fc3eac85e5ed2cf0f66e81fb9ab",
-      "role": "user"
-    }
-  ]
-}
+[
+  {
+    "id": "1",
+    "username": "admin",
+    "password": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+    "role": "admin",
+    "full_name": "Administrator"
+  },
+  {
+    "id": "2",
+    "username": "hoangca",
+    "password": "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f",
+    "role": "user",
+    "full_name": "hoang"
+  }
+]

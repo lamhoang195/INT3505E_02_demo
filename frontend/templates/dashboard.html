@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Người dùng{% endblock %}
+
+{% block header %}Dashboard - Người dùng{% endblock %}
+
+{% block content %}
+<div class="nav">
+    <a href="/dashboard">Dashboard</a>
+    <a href="#" onclick="logout()">Đăng xuất</a>
+</div>
+
+<div id="userInfo" class="card">
+    <h3>Thông tin người dùng</h3>
+    <p id="userDetails">Đang tải...</p>
+</div>
+
+<div class="card">
+    <h3>Danh sách sách</h3>
+    <div id="booksList">Đang tải...</div>
+</div>
+
+<div class="card">
+    <h3>Sách đang mượn</h3>
+    <div id="borrowedBooks">Đang tải...</div>
+</div>
+
+<script>
+let currentUser = null;
+
+async function loadUserInfo() {
+    currentUser = getCurrentUser();
+    if (!currentUser) {
+        window.location.href = '/login';
+        return;
+    }
+    
+    document.getElementById('userDetails').innerHTML = `
+        <strong>Họ tên:</strong> ${currentUser.full_name}<br>
+        <strong>Tên đăng nhập:</strong> ${currentUser.username}<br>
+        <strong>Vai trò:</strong> ${currentUser.role}
+    `;
+}
+
+async function loadBooks() {
+    try {
+        const result = await apiCall('/books');
+        const books = result.data;
+        
+        if (books.length === 0) {
+            document.getElementById('booksList').innerHTML = '<p>Chưa có sách nào.</p>';
+            return;
+        }
+        
+        let html = '<table><thead><tr><th>Tên sách</th><th>Tác giả</th><th>ISBN</th><th>Còn lại</th><th>Thao tác</th></tr></thead><tbody>';
+        
+        books.forEach(book => {
+            html += `
+                <tr>
+                    <td>${book.title}</td>
+                    <td>${book.author}</td>
+                    <td>${book.isbn || 'N/A'}</td>
+                    <td>${book.available}/${book.quantity}</td>
+                    <td>
+                        <button class="btn btn-success" onclick="borrowBook('${book.id}')" ${book.available <= 0 ? 'disabled' : ''}>
+                            Mượn sách
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += '</tbody></table>';
+        document.getElementById('booksList').innerHTML = html;
+        
+    } catch (error) {
+        showAlert('Lỗi khi tải danh sách sách: ' + error.message, 'error');
+    }
+}
+
+async function loadBorrowedBooks() {
+    try {
+        const result = await apiCall(`/borrows?user_id=${currentUser.id}&status=active`);
+        const borrows = result.data;
+        
+        if (borrows.length === 0) {
+            document.getElementById('borrowedBooks').innerHTML = '<p>Bạn chưa mượn sách nào.</p>';
+            return;
+        }
+        
+        // Load book details
+        const booksResult = await apiCall('/books');
+        const books = booksResult.data;
+        
+        let html = '<table><thead><tr><th>Tên sách</th><th>Ngày mượn</th><th>Hạn trả</th><th>Thao tác</th></tr></thead><tbody>';
+        
+        borrows.forEach(borrow => {
+            const book = books.find(b => b.id === borrow.book_id);
+            const borrowDate = new Date(borrow.borrow_date).toLocaleDateString('vi-VN');
+            const dueDate = new Date(borrow.due_date).toLocaleDateString('vi-VN');
+            
+            html += `
+                <tr>
+                    <td>${book ? book.title : 'N/A'}</td>
+                    <td>${borrowDate}</td>
+                    <td>${dueDate}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="returnBook('${borrow.id}')">
+                            Trả sách
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += '</tbody></table>';
+        document.getElementById('borrowedBooks').innerHTML = html;
+        
+    } catch (error) {
+        showAlert('Lỗi khi tải danh sách sách đã mượn: ' + error.message, 'error');
+    }
+}
+
+async function borrowBook(bookId) {
+    try {
+        await apiCall('/borrows', 'POST', {
+            user_id: currentUser.id,
+            book_id: bookId
+        });
+        
+        showAlert('Mượn sách thành công!', 'success');
+        loadBooks();
+        loadBorrowedBooks();
+        
+    } catch (error) {
+        showAlert('Lỗi khi mượn sách: ' + error.message, 'error');
+    }
+}
+
+async function returnBook(borrowId) {
+    try {
+        await apiCall(`/borrows/${borrowId}/return`, 'POST');
+        
+        showAlert('Trả sách thành công!', 'success');
+        loadBooks();
+        loadBorrowedBooks();
+        
+    } catch (error) {
+        showAlert('Lỗi khi trả sách: ' + error.message, 'error');
+    }
+}
+
+window.onload = function() {
+    loadUserInfo();
+    loadBooks();
+    loadBorrowedBooks();
+};
+</script>
+{% endblock %}
+

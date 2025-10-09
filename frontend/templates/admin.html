@@ -1,78 +1,238 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block header %}Admin Dashboard{% endblock %}
+
 {% block content %}
-<h3 class="mb-3">Quản trị sách</h3>
-<div class="card mb-4">
-  <div class="card-body">
-    <form id="createBookForm" class="row g-2">
-      <div class="col-md-5"><input class="form-control" name="title" placeholder="Tên sách" required /></div>
-      <div class="col-md-5"><input class="form-control" name="author" placeholder="Tác giả" required /></div>
-      <div class="col-md-2 d-grid"><button class="btn btn-primary" type="submit">Thêm</button></div>
-    </form>
-  </div>
- </div>
+<div class="nav">
+    <a href="/admin">Trang chủ</a>
+    <a href="#" onclick="logout()">Đăng xuất</a>
+</div>
 
-<h5>Danh sách sách</h5>
-<table class="table table-striped">
-  <thead><tr><th>ID</th><th>Tên</th><th>Tác giả</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
-  <tbody id="booksTbody">
-    {% for b in books %}
-    <tr data-id="{{ b.id }}">
-      <td>{{ b.id }}</td>
-      <td><input class="form-control form-control-sm title" value="{{ b.title }}" /></td>
-      <td><input class="form-control form-control-sm author" value="{{ b.author }}" /></td>
-      <td>{{ 'Có sẵn' if b.available else 'Đang mượn' }}</td>
-      <td>
-        <button class="btn btn-sm btn-success me-1" onclick="updateBook({{ b.id }})">Lưu</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteBook({{ b.id }})">Xóa</button>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
- </table>
+<div id="userInfo" class="card">
+    <h3>Thông tin Admin</h3>
+    <p id="userDetails">Đang tải...</p>
+</div>
 
-<h5 class="mt-4">Quản lý mượn sách</h5>
-<table class="table table-bordered">
-  <thead><tr><th>Mã</th><th>Sách</th><th>Người mượn</th><th>Hành động</th></tr></thead>
-  <tbody>
-    {% for br in borrows %}
-    <tr>
-      <td>{{ br.id }}</td>
-      <td>{{ br.book_id }}</td>
-      <td>{{ br.username }}</td>
-      <td><button class="btn btn-sm btn-outline-danger" onclick="deleteBorrow({{ br.id }})">Xóa</button></td>
-    </tr>
-    {% endfor %}
-  </tbody>
- </table>
+<div class="card">
+    <h3>Quản lý sách</h3>
+    <button class="btn" onclick="showAddBookForm()">Thêm sách mới</button>
+    
+    <div id="addBookForm" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 5px;">
+        <h4>Thêm sách mới</h4>
+        <form onsubmit="addBook(event)">
+            <div class="form-group">
+                <label>Tên sách:</label>
+                <input type="text" id="bookTitle" required>
+            </div>
+            <div class="form-group">
+                <label>Tác giả:</label>
+                <input type="text" id="bookAuthor" required>
+            </div>
+            <div class="form-group">
+                <label>ISBN:</label>
+                <input type="text" id="bookISBN">
+            </div>
+            <div class="form-group">
+                <label>Số lượng:</label>
+                <input type="number" id="bookQuantity" value="1" min="1" required>
+            </div>
+            <button type="submit" class="btn btn-success">Lưu</button>
+            <button type="button" class="btn btn-secondary" onclick="hideAddBookForm()">Hủy</button>
+        </form>
+    </div>
+    
+    <div id="booksList">Đang tải...</div>
+</div>
+
+<div class="card">
+    <h3>Quản lý người dùng</h3>
+    <div id="usersList">Đang tải...</div>
+</div>
+
+<div class="card">
+    <h3>Quản lý mượn trả</h3>
+    <div id="borrowsList">Đang tải...</div>
+</div>
 
 <script>
-const form = document.getElementById('createBookForm');
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const fd = new FormData(form);
-  const payload = { title: fd.get('title'), author: fd.get('author') };
-  const res = await axios.post('/admin/books', payload);
-  if (res.data.ok) location.reload();
-});
+let currentUser = null;
 
-async function updateBook(id) {
-  const tr = document.querySelector(`tr[data-id="${id}"]`);
-  const title = tr.querySelector('.title').value;
-  const author = tr.querySelector('.author').value;
-  const res = await axios.put(`/admin/books/${id}`, { title, author });
-  if (res.data.ok) location.reload();
+async function loadUserInfo() {
+    currentUser = getCurrentUser();
+    if (!currentUser || currentUser.role !== 'admin') {
+        showAlert('Bạn không có quyền truy cập trang này', 'error');
+        setTimeout(() => window.location.href = '/login', 1000);
+        return;
+    }
+    
+    document.getElementById('userDetails').innerHTML = `
+        <strong>Họ tên:</strong> ${currentUser.full_name}<br>
+        <strong>Tên đăng nhập:</strong> ${currentUser.username}<br>
+        <strong>Vai trò:</strong> ${currentUser.role}
+    `;
 }
 
-async function deleteBook(id) {
-  const res = await axios.delete(`/admin/books/${id}`);
-  if (res.data.ok) location.reload();
+function showAddBookForm() {
+    document.getElementById('addBookForm').style.display = 'block';
 }
 
-async function deleteBorrow(id) {
-  const res = await axios.delete(`/admin/borrows/${id}`);
-  if (res.data.ok) location.reload();
+function hideAddBookForm() {
+    document.getElementById('addBookForm').style.display = 'none';
+    document.getElementById('bookTitle').value = '';
+    document.getElementById('bookAuthor').value = '';
+    document.getElementById('bookISBN').value = '';
+    document.getElementById('bookQuantity').value = '1';
 }
+
+async function addBook(event) {
+    event.preventDefault();
+    
+    try {
+        await apiCall('/books', 'POST', {
+            title: document.getElementById('bookTitle').value,
+            author: document.getElementById('bookAuthor').value,
+            isbn: document.getElementById('bookISBN').value,
+            quantity: parseInt(document.getElementById('bookQuantity').value)
+        });
+        
+        showAlert('Thêm sách thành công!', 'success');
+        hideAddBookForm();
+        loadBooks();
+        
+    } catch (error) {
+        showAlert('Lỗi khi thêm sách: ' + error.message, 'error');
+    }
+}
+
+async function loadBooks() {
+    try {
+        const result = await apiCall('/books');
+        const books = result.data;
+        
+        if (books.length === 0) {
+            document.getElementById('booksList').innerHTML = '<p>Chưa có sách nào.</p>';
+            return;
+        }
+        
+        let html = '<table><thead><tr><th>ID</th><th>Tên sách</th><th>Tác giả</th><th>ISBN</th><th>Còn lại</th><th>Thao tác</th></tr></thead><tbody>';
+        
+        books.forEach(book => {
+            html += `
+                <tr>
+                    <td>${book.id}</td>
+                    <td>${book.title}</td>
+                    <td>${book.author}</td>
+                    <td>${book.isbn || 'N/A'}</td>
+                    <td>${book.available}/${book.quantity}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteBook('${book.id}', '${book.title}')">
+                            Xóa
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += '</tbody></table>';
+        document.getElementById('booksList').innerHTML = html;
+        
+    } catch (error) {
+        showAlert('Lỗi khi tải danh sách sách: ' + error.message, 'error');
+    }
+}
+
+async function deleteBook(bookId, bookTitle) {
+    if (!confirm(`Bạn có chắc muốn xóa sách "${bookTitle}"?`)) {
+        return;
+    }
+    
+    try {
+        await apiCall(`/books/${bookId}`, 'DELETE');
+        showAlert('Xóa sách thành công!', 'success');
+        loadBooks();
+    } catch (error) {
+        showAlert('Lỗi khi xóa sách: ' + error.message, 'error');
+    }
+}
+
+async function loadUsers() {
+    try {
+        const result = await apiCall('/users');
+        const users = result.data;
+        
+        let html = '<table><thead><tr><th>ID</th><th>Tên đăng nhập</th><th>Họ tên</th><th>Vai trò</th></tr></thead><tbody>';
+        
+        users.forEach(user => {
+            html += `
+                <tr>
+                    <td>${user.id}</td>
+                    <td>${user.username}</td>
+                    <td>${user.full_name}</td>
+                    <td>${user.role}</td>
+                </tr>
+            `;
+        });
+        
+        html += '</tbody></table>';
+        document.getElementById('usersList').innerHTML = html;
+        
+    } catch (error) {
+        showAlert('Lỗi khi tải danh sách người dùng: ' + error.message, 'error');
+    }
+}
+
+async function loadBorrows() {
+    try {
+        const result = await apiCall('/borrows');
+        const borrows = result.data;
+        
+        if (borrows.length === 0) {
+            document.getElementById('borrowsList').innerHTML = '<p>Chưa có lịch sử mượn trả.</p>';
+            return;
+        }
+        
+        // Load books and users
+        const booksResult = await apiCall('/books');
+        const usersResult = await apiCall('/users');
+        const books = booksResult.data;
+        const users = usersResult.data;
+        
+        let html = '<table><thead><tr><th>ID</th><th>Người mượn</th><th>Sách</th><th>Ngày mượn</th><th>Hạn trả</th><th>Trạng thái</th></tr></thead><tbody>';
+        
+        borrows.forEach(borrow => {
+            const book = books.find(b => b.id === borrow.book_id);
+            const user = users.find(u => u.id === borrow.user_id);
+            const borrowDate = new Date(borrow.borrow_date).toLocaleDateString('vi-VN');
+            const dueDate = new Date(borrow.due_date).toLocaleDateString('vi-VN');
+            
+            html += `
+                <tr>
+                    <td>${borrow.id}</td>
+                    <td>${user ? user.full_name : 'N/A'}</td>
+                    <td>${book ? book.title : 'N/A'}</td>
+                    <td>${borrowDate}</td>
+                    <td>${dueDate}</td>
+                    <td>${borrow.status === 'borrowed' ? '🔴 Đang mượn' : '🟢 Đã trả'}</td>
+                </tr>
+            `;
+        });
+        
+        html += '</tbody></table>';
+        document.getElementById('borrowsList').innerHTML = html;
+        
+    } catch (error) {
+        showAlert('Lỗi khi tải danh sách mượn trả: ' + error.message, 'error');
+    }
+}
+
+window.onload = function() {
+    loadUserInfo();
+    loadBooks();
+    loadUsers();
+    loadBorrows();
+};
 </script>
 {% endblock %}
-
 
