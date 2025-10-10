@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - Người dùng{% endblock %}
+{% block title %}Dashboard V2 - Người dùng{% endblock %}
 
-{% block header %}Dashboard - Người dùng{% endblock %}
+{% block header %}Dashboard V2 - Người dùng (với HATEOAS){% endblock %}
 
 {% block content %}
 <div class="nav">
@@ -18,6 +18,9 @@
 
 <div class="card">
     <h3>Danh sách sách</h3>
+    <p style="color: #28a745; font-size: 14px; margin-bottom: 15px;">
+        <strong>✨ Dashboard V2:</strong> Sử dụng API V2 với HATEOAS - response chứa <code>_links</code> và <code>_metadata</code>
+    </p>
     <div id="booksList">Đang tải...</div>
 </div>
 
@@ -28,6 +31,7 @@
 
 <script>
 let currentUser = null;
+const API_V2_BASE_URL = 'http://localhost:5000/api/v2';
 
 async function loadUserInfo() {
     currentUser = getCurrentUser();
@@ -45,7 +49,9 @@ async function loadUserInfo() {
 
 async function loadBooks() {
     try {
-        const result = await apiCall('/books');
+        // Use V2 API with HATEOAS
+        const response = await fetch(`${API_V2_BASE_URL}/books`);
+        const result = await response.json();
         const books = result.data;
         
         if (books.length === 0) {
@@ -81,6 +87,7 @@ async function loadBooks() {
 
 async function loadBorrowedBooks() {
     try {
+        // Uses V1 API for borrows (V2 only implements Books)
         const result = await apiCall(`/borrows?user_id=${currentUser.id}&status=active`);
         const borrows = result.data;
         
@@ -89,7 +96,7 @@ async function loadBorrowedBooks() {
             return;
         }
         
-        // Load book details
+        // Load book details from V1
         const booksResult = await apiCall('/books');
         const books = booksResult.data;
         
@@ -124,6 +131,7 @@ async function loadBorrowedBooks() {
 
 async function borrowBook(bookId) {
     try {
+        // Uses V1 API for borrowing
         await apiCall('/borrows', 'POST', {
             user_id: currentUser.id,
             book_id: bookId
@@ -140,6 +148,7 @@ async function borrowBook(bookId) {
 
 async function returnBook(borrowId) {
     try {
+        // Uses V1 API for returning
         await apiCall(`/borrows/${borrowId}/return`, 'POST');
         
         showAlert('Trả sách thành công!', 'success');

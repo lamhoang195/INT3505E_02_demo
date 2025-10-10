@@ -1,0 +1,25 @@
+// Invoke-WebRequest -Uri http://localhost:5000/api/v3/auth/login -Method POST -Headers @{"Content-Type"="application/json"} -Body '{"username":"admin","password":"admin123"}' | Select-Object -ExpandProperty Content'
+
+{
+    "_instructions": {
+      "example": "Authorization: Bearer eyJhbGciOiJIUzI1NiIs...",
+      "usage": "Include token in Authorization header as: Bearer <token>"
+    },
+    "_metadata": {
+      "authentication_type": "JWT",
+      "expires_at": "2025-10-11T00:46:22.015234Z",
+      "stateless": true,
+      "token_algorithm": "HS256"
+    },
+    "expires_in": 86400,
+    "message": "Login successful",
+    "success": true,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3NjAxNDM1ODIsImlhdCI6MTc2MDA1NzE4Mn0.A_55mfK29pTWLW_-jUwXmMtVP41BuAKUBoZs02wl21Y",
+    "token_type": "Bearer",
+    "user": {
+      "full_name": "Administrator",
+      "id": "1",
+      "role": "admin",
+      "username": "admin"
+    }
+  }

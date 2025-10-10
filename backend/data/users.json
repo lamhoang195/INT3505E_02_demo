@@ -12,5 +12,12 @@
     "password": "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f",
     "role": "user",
     "full_name": "hoang"
+  },
+  {
+    "id": "3",
+    "username": "lamhoang",
+    "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+    "role": "user",
+    "full_name": "hoang"
   }
 ]

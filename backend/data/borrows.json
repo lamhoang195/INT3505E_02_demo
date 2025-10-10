@@ -5,7 +5,70 @@
     "book_id": "1",
     "borrow_date": "2025-10-09T22:11:40.524072",
     "due_date": "2025-10-23T22:11:40.524072",
-    "return_date": null,
-    "status": "borrowed"
+    "return_date": "2025-10-10T07:34:28.959605",
+    "status": "returned"
+  },
+  {
+    "id": "2",
+    "user_id": "2",
+    "book_id": "1",
+    "borrow_date": "2025-10-10T07:35:36.355672",
+    "due_date": "2025-10-24T07:35:36.355672",
+    "return_date": "2025-10-10T07:36:07.868363",
+    "status": "returned"
+  },
+  {
+    "id": "3",
+    "user_id": "2",
+    "book_id": "1",
+    "borrow_date": "2025-10-10T07:35:59.618293",
+    "due_date": "2025-10-24T07:35:59.618293",
+    "return_date": "2025-10-10T07:36:09.243252",
+    "status": "returned"
+  },
+  {
+    "id": "4",
+    "user_id": "2",
+    "book_id": "1",
+    "borrow_date": "2025-10-10T07:36:01.462352",
+    "due_date": "2025-10-24T07:36:01.462352",
+    "return_date": "2025-10-10T07:36:10.428202",
+    "status": "returned"
+  },
+  {
+    "id": "5",
+    "user_id": "2",
+    "book_id": "1",
+    "borrow_date": "2025-10-10T07:36:15.822597",
+    "due_date": "2025-10-24T07:36:15.822597",
+    "return_date": "2025-10-10T07:39:12.994796",
+    "status": "returned"
+  },
+  {
+    "id": "6",
+    "user_id": "2",
+    "book_id": "1",
+    "borrow_date": "2025-10-10T07:39:16.562873",
+    "due_date": "2025-10-24T07:39:16.562873",
+    "return_date": "2025-10-10T07:39:25.770369",
+    "status": "returned"
+  },
+  {
+    "id": "7",
+    "user_id": "2",
+    "book_id": "1",
+    "borrow_date": "2025-10-10T07:39:28.560619",
+    "due_date": "2025-10-24T07:39:28.560619",
+    "return_date": "2025-10-10T07:39:34.533807",
+    "status": "returned"
+  },
+  {
+    "id": "8",
+    "user_id": "3",
+    "book_id": "1",
+    "borrow_date": "2025-10-10T07:52:02.174181",
+    "due_date": "2025-10-24T07:52:02.174181",
+    "return_date": "2025-10-10T07:52:04.454061",
+    "status": "returned"
   }
 ]
