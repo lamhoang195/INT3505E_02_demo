@@ -97,6 +97,135 @@ def get_books():
         'data': books
     }), 200
 
+@books_v1.route('/api/v1/books/search', methods=['GET'])
+def search_books():
+    """
+    Tìm kiếm và phân trang sách
+    ---
+    tags:
+      - V1 - Books
+    parameters:
+      - name: search
+        in: query
+        type: string
+        required: false
+        description: Từ khóa tìm kiếm (tìm trong tiêu đề và tác giả)
+        example: "Clean"
+      - name: page
+        in: query
+        type: integer
+        required: false
+        default: 1
+        description: Số trang (bắt đầu từ 1)
+        example: 1
+      - name: per_page
+        in: query
+        type: integer
+        required: false
+        default: 10
+        description: Số lượng sách trên mỗi trang
+        example: 10
+    responses:
+      200:
+        description: Kết quả tìm kiếm và phân trang
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+              example: true
+            data:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "1"
+                      title:
+                        type: string
+                        example: "Clean Code"
+                      author:
+                        type: string
+                        example: "Robert C. Martin"
+                      isbn:
+                        type: string
+                        example: "978-0132350884"
+                      quantity:
+                        type: integer
+                        example: 5
+                      available:
+                        type: integer
+                        example: 3
+                pagination:
+                  type: object
+                  properties:
+                    page:
+                      type: integer
+                      example: 1
+                    per_page:
+                      type: integer
+                      example: 10
+                    total:
+                      type: integer
+                      example: 25
+                    total_pages:
+                      type: integer
+                      example: 3
+                    has_prev:
+                      type: boolean
+                      example: false
+                    has_next:
+                      type: boolean
+                      example: true
+      400:
+        description: Tham số không hợp lệ
+        schema:
+          type: object
+          properties:
+            success:
+              type: boolean
+              example: false
+            error:
+              type: string
+              example: "Invalid parameters"
+    """
+    try:
+        # Get query parameters
+        search = request.args.get('search', None)
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 10))
+        
+        # Validate parameters
+        if page < 1:
+            return jsonify({
+                'success': False,
+                'error': 'Page must be greater than 0'
+            }), 400
+        
+        if per_page < 1 or per_page > 100:
+            return jsonify({
+                'success': False,
+                'error': 'Per_page must be between 1 and 100'
+            }), 400
+        
+        # Get paginated results
+        result = book_service.search_and_paginate_books(search, page, per_page)
+        
+        return jsonify({
+            'success': True,
+            'data': result
+        }), 200
+        
+    except ValueError:
+        return jsonify({
+            'success': False,
+            'error': 'Invalid parameters: page and per_page must be integers'
+        }), 400
+
 @books_v1.route('/api/v1/books/<book_id>', methods=['GET'])
 def get_book(book_id):
     """

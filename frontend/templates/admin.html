@@ -43,7 +43,33 @@
         </form>
     </div>
     
+    <!-- Search and Pagination Controls -->
+    <div style="margin-top: 20px; margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+        <input type="text" id="searchInput" placeholder="Tìm kiếm sách theo tên hoặc tác giả..." 
+               style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+        <button class="btn" onclick="searchBooks()">🔍 Tìm kiếm</button>
+        <button class="btn" onclick="resetSearch()" style="background: #6c757d;">↺ Reset</button>
+    </div>
+    
     <div id="booksList">Đang tải...</div>
+    
+    <!-- Pagination Controls -->
+    <div id="paginationControls" style="margin-top: 20px; text-align: center; display: none;">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+            <button class="btn" id="prevBtn" onclick="previousPage()" style="padding: 8px 16px;">
+                ← Trang trước
+            </button>
+            <span id="pageInfo" style="padding: 0 20px; font-weight: bold;">
+                Trang 1 / 1
+            </span>
+            <button class="btn" id="nextBtn" onclick="nextPage()" style="padding: 8px 16px;">
+                Trang sau →
+            </button>
+        </div>
+        <div style="margin-top: 10px; color: #666;">
+            <span id="totalInfo">Tổng số: 0 sách</span>
+        </div>
+    </div>
 </div>
 
 <div class="card">
@@ -58,6 +84,9 @@
 
 <script>
 let currentUser = null;
+let currentPage = 1;
+let perPage = 5;
+let currentSearch = '';
 
 async function loadUserInfo() {
     currentUser = getCurrentUser();
@@ -99,20 +128,33 @@ async function addBook(event) {
         
         showAlert('Thêm sách thành công!', 'success');
         hideAddBookForm();
-        loadBooks();
+        loadBooks(1, currentSearch);
         
     } catch (error) {
         showAlert('Lỗi khi thêm sách: ' + error.message, 'error');
     }
 }
 
-async function loadBooks() {
+async function loadBooks(page = 1, search = '') {
     try {
-        const result = await apiCall('/books');
-        const books = result.data;
+        // Build API URL with pagination and search
+        let url = `/books/search?page=${page}&per_page=${perPage}`;
+        if (search) {
+            url += `&search=${encodeURIComponent(search)}`;
+        }
+        
+        const result = await apiCall(url);
+        const data = result.data;
+        const books = data.items;
+        const pagination = data.pagination;
+        
+        // Update current state
+        currentPage = pagination.page;
+        currentSearch = search;
         
         if (books.length === 0) {
-            document.getElementById('booksList').innerHTML = '<p>Chưa có sách nào.</p>';
+            document.getElementById('booksList').innerHTML = '<p>Không tìm thấy sách nào.</p>';
+            document.getElementById('paginationControls').style.display = 'none';
             return;
         }
         
@@ -138,10 +180,78 @@ async function loadBooks() {
         html += '</tbody></table>';
         document.getElementById('booksList').innerHTML = html;
         
+        // Update pagination controls
+        updatePaginationControls(pagination);
+        
     } catch (error) {
         showAlert('Lỗi khi tải danh sách sách: ' + error.message, 'error');
     }
 }
+
+function updatePaginationControls(pagination) {
+    const paginationDiv = document.getElementById('paginationControls');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const pageInfo = document.getElementById('pageInfo');
+    const totalInfo = document.getElementById('totalInfo');
+    
+    // Show pagination only if there are results
+    if (pagination.total > 0) {
+        paginationDiv.style.display = 'block';
+        
+        // Update page info
+        pageInfo.textContent = `Trang ${pagination.page} / ${pagination.total_pages}`;
+        totalInfo.textContent = `Tổng số: ${pagination.total} sách`;
+        
+        // Enable/disable buttons
+        prevBtn.disabled = !pagination.has_prev;
+        nextBtn.disabled = !pagination.has_next;
+        
+        // Update button styles
+        prevBtn.style.opacity = pagination.has_prev ? '1' : '0.5';
+        nextBtn.style.opacity = pagination.has_next ? '1' : '0.5';
+        prevBtn.style.cursor = pagination.has_prev ? 'pointer' : 'not-allowed';
+        nextBtn.style.cursor = pagination.has_next ? 'pointer' : 'not-allowed';
+    } else {
+        paginationDiv.style.display = 'none';
+    }
+}
+
+function searchBooks() {
+    const searchInput = document.getElementById('searchInput');
+    const searchTerm = searchInput.value.trim();
+    currentPage = 1; // Reset to first page when searching
+    loadBooks(currentPage, searchTerm);
+}
+
+function resetSearch() {
+    document.getElementById('searchInput').value = '';
+    currentPage = 1;
+    currentSearch = '';
+    loadBooks(currentPage, '');
+}
+
+function previousPage() {
+    if (currentPage > 1) {
+        loadBooks(currentPage - 1, currentSearch);
+    }
+}
+
+function nextPage() {
+    loadBooks(currentPage + 1, currentSearch);
+}
+
+// Allow search on Enter key
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchBooks();
+            }
+        });
+    }
+});
 
 async function deleteBook(bookId, bookTitle) {
     if (!confirm(`Bạn có chắc muốn xóa sách "${bookTitle}"?`)) {
@@ -151,7 +261,7 @@ async function deleteBook(bookId, bookTitle) {
     try {
         await apiCall(`/books/${bookId}`, 'DELETE');
         showAlert('Xóa sách thành công!', 'success');
-        loadBooks();
+        loadBooks(currentPage, currentSearch);
     } catch (error) {
         showAlert('Lỗi khi xóa sách: ' + error.message, 'error');
     }

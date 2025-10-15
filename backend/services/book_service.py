@@ -101,4 +101,54 @@ class BookService:
                     return True
                 return False
         return False
+    
+    def search_and_paginate_books(self, search: Optional[str] = None, page: int = 1, per_page: int = 10) -> Dict:
+        """
+        Search and paginate books
+        
+        Args:
+            search: Search keyword (searches in title and author)
+            page: Page number (starts from 1)
+            per_page: Number of items per page
+            
+        Returns:
+            Dictionary containing paginated results and metadata
+        """
+        books = self._read_books()
+        
+        # Filter by search keyword if provided
+        if search:
+            search_lower = search.lower()
+            books = [
+                book for book in books
+                if search_lower in book.get('title', '').lower() or 
+                   search_lower in book.get('author', '').lower()
+            ]
+        
+        # Calculate pagination
+        total = len(books)
+        total_pages = (total + per_page - 1) // per_page if per_page > 0 else 1
+        
+        # Ensure page is within valid range
+        if page < 1:
+            page = 1
+        if page > total_pages and total_pages > 0:
+            page = total_pages
+        
+        # Get items for current page
+        start_idx = (page - 1) * per_page
+        end_idx = start_idx + per_page
+        items = books[start_idx:end_idx]
+        
+        return {
+            'items': items,
+            'pagination': {
+                'page': page,
+                'per_page': per_page,
+                'total': total,
+                'total_pages': total_pages,
+                'has_prev': page > 1,
+                'has_next': page < total_pages
+            }
+        }
 
