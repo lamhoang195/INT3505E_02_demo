@@ -34,7 +34,7 @@ curl -X POST http://localhost:5000/api/v3/auth/login \
 {
   "success": true,
   "message": "Login successful",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MjkwMDAwMDAsImlhdCI6MTcyODkxMzYwMH0.xxxxx",
+  "token": "<YOUR_JWT_TOKEN_WILL_BE_HERE>",
   "token_type": "Bearer",
   "expires_in": 86400,
   "user": {
@@ -50,10 +50,12 @@ curl -X POST http://localhost:5000/api/v3/auth/login \
   },
   "_instructions": {
     "usage": "Include token in Authorization header as: Bearer <token>",
-    "example": "Authorization: Bearer eyJhbGciOiJIUzI1Ni..."
+    "example": "Authorization: Bearer <YOUR_TOKEN>"
   }
 }
 ```
+
+**⚠️ Security Note:** The actual token will be a long string like `eyJhbGc...` but DO NOT share real tokens in documentation!
 
 **📝 Lưu ý:** Token này chứa đầy đủ thông tin user (id, username, role) được mã hóa.
 

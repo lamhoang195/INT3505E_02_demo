@@ -2,6 +2,17 @@
 
 Hệ thống quản lý thư viện với kiến trúc RESTful API, được phát triển để minh họa **từng nguyên tắc REST (REST Constraints)** qua các phiên bản API khác nhau.
 
+## ⚠️ Security Notice
+
+**IMPORTANT:** This is a demo/educational project. Before using in production:
+
+- 🔐 Change all default passwords (`admin/admin123`)
+- 🔑 Rotate JWT secret keys (use strong random values)
+- 🚫 Never commit `.env` files or real tokens to Git
+- ✅ Review `SECURITY_AUDIT_REPORT.md` for security guidelines
+- 🔒 Use HTTPS in production
+- 📝 Follow the `.env.example` for proper configuration
+
 ## 📋 Tổng quan
 
 Dự án này demo các nguyên tắc REST API theo cách tiếp cận từng bước:
@@ -331,12 +342,22 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. Chạy ứng dụng:
+4. Cấu hình môi trường (khuyến nghị):
+```bash
+# Copy file .env.example và chỉnh sửa
+cp .env.example .env
+
+# Generate strong secret keys
+python -c "import secrets; print('SECRET_KEY=' + secrets.token_hex(32))" >> .env
+python -c "import secrets; print('JWT_SECRET_KEY=' + secrets.token_hex(32))" >> .env
+```
+
+5. Chạy ứng dụng:
 ```bash
 python run.py
 ```
 
-5. Truy cập ứng dụng:
+6. Truy cập ứng dụng:
 
 | URL | Mô tả |
 |-----|-------|
@@ -352,9 +373,11 @@ python run.py
 
 ## 🔐 Tài khoản mặc định
 
-**Admin:**
+**Admin (Demo only - Change in production!):**
 - Username: `admin`
 - Password: `admin123`
+
+⚠️ **Security Warning:** These are default credentials for demo purposes only. In a production environment, you MUST change these credentials immediately after first login!
 
 ## 📚 OpenAPI/Swagger Documentation
 
@@ -379,6 +402,22 @@ Sau khi chạy server, truy cập:
 1. Tải về OpenAPI spec: http://localhost:5000/apispec.json
 2. Mở Postman → Import → Paste link hoặc upload file
 3. Tất cả endpoints sẽ được tự động import với đầy đủ documentation
+
+## 🔒 Security
+
+Dự án này bao gồm các biện pháp bảo mật:
+
+- **Pre-commit hooks**: Tự động scan và ngăn chặn commit tokens/secrets
+- **Security audit report**: Xem `SECURITY_AUDIT_REPORT.md` để biết chi tiết
+- **Environment variables**: Sử dụng `.env` file (không commit vào Git)
+- **JWT Authentication**: Stateless authentication với tokens có thời hạn
+
+### Báo cáo lỗ hổng bảo mật
+
+Nếu phát hiện vấn đề bảo mật, vui lòng:
+1. KHÔNG tạo public issue
+2. Liên hệ trực tiếp với maintainers
+3. Cung cấp chi tiết về lỗ hổng
 
 ## 📄 License
 

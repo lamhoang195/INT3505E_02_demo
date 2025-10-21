@@ -30,6 +30,19 @@ backend/data/*.json
 # Logs
 *.log
 
+# Security - Sensitive files and credentials
+*.env
+*.env.local
+*.env.production
+.env.*
+!.env.example
+**/tokens.json
+**/secrets.json
+**/*_token*.json
+config/local.py
+config/production.py
+**/credentials.json
+
 # Distribution / packaging
 .Python
 build/
