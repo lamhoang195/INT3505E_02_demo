@@ -1,0 +1,95 @@
+[
+  {
+    "id": 1,
+    "name": "Laptop Dell XPS 15",
+    "description": "High-performance laptop for professionals with 15.6-inch display",
+    "price": 1299.99,
+    "category": "Electronics",
+    "stock": 25,
+    "created_at": "2024-01-15T10:30:00Z"
+  },
+  {
+    "id": 2,
+    "name": "iPhone 15 Pro",
+    "description": "Latest Apple smartphone with A17 Pro chip",
+    "price": 999.99,
+    "category": "Electronics",
+    "stock": 50,
+    "created_at": "2024-01-16T14:20:00Z"
+  },
+  {
+    "id": 3,
+    "name": "Sony WH-1000XM5",
+    "description": "Premium noise-cancelling wireless headphones",
+    "price": 399.99,
+    "category": "Electronics",
+    "stock": 30,
+    "created_at": "2024-01-17T09:15:00Z"
+  },
+  {
+    "id": 4,
+    "name": "Samsung 55\" 4K Smart TV",
+    "description": "Crystal UHD 4K TV with HDR support",
+    "price": 699.99,
+    "category": "Electronics",
+    "stock": 15,
+    "created_at": "2024-01-18T11:45:00Z"
+  },
+  {
+    "id": 5,
+    "name": "Ergonomic Office Chair",
+    "description": "Comfortable mesh office chair with lumbar support",
+    "price": 249.99,
+    "category": "Furniture",
+    "stock": 40,
+    "created_at": "2024-01-19T08:30:00Z"
+  },
+  {
+    "id": 6,
+    "name": "Standing Desk",
+    "description": "Height-adjustable electric standing desk",
+    "price": 449.99,
+    "category": "Furniture",
+    "stock": 20,
+    "created_at": "2024-01-20T13:00:00Z"
+  },
+  {
+    "id": 7,
+    "name": "Mechanical Keyboard",
+    "description": "RGB mechanical gaming keyboard with Cherry MX switches",
+    "price": 159.99,
+    "category": "Accessories",
+    "stock": 60,
+    "created_at": "2024-01-21T10:00:00Z"
+  },
+  {
+    "id": 8,
+    "name": "Wireless Mouse",
+    "description": "Ergonomic wireless mouse with 6 buttons",
+    "price": 49.99,
+    "category": "Accessories",
+    "stock": 100,
+    "created_at": "2024-01-22T15:30:00Z"
+  },
+  {
+    "id": 9,
+    "name": "USB-C Hub",
+    "description": "7-in-1 USB-C hub with HDMI and SD card reader",
+    "price": 39.99,
+    "category": "Accessories",
+    "stock": 75,
+    "created_at": "2024-01-23T09:45:00Z"
+  },
+  {
+    "id": 10,
+    "name": "Webcam HD 1080p",
+    "description": "Full HD webcam for video conferencing",
+    "price": 89.99,
+    "category": "Electronics",
+    "stock": 45,
+    "created_at": "2024-01-24T12:20:00Z"
+  }
+]
+
+
+

@@ -21,6 +21,9 @@ from backend.api.v3.auth import auth_v3
 from backend.api.v4.books_cache_control import books_v4_cache
 from backend.api.v4.books_etag import books_v4_etag
 
+# Import V5 API blueprints
+from backend.api.v5.auth_storage import auth_storage_v5
+
 def create_app():
     """Create and configure Flask application"""
     app = Flask(__name__, 
@@ -96,6 +99,10 @@ def create_app():
             {
                 "name": "V4 - Books (ETag)",
                 "description": "API V4 - Quản lý sách với ETag headers"
+            },
+            {
+                "name": "V5 - Auth Storage Demo",
+                "description": "API V5 - Demo các phương pháp lưu trữ token (localStorage, sessionStorage, HTTP-Only Cookie)"
             }
         ],
         "securityDefinitions": {
@@ -124,6 +131,9 @@ def create_app():
     # Register V4 API blueprints
     app.register_blueprint(books_v4_cache)
     app.register_blueprint(books_v4_etag)
+    
+    # Register V5 API blueprints
+    app.register_blueprint(auth_storage_v5)
     
     # Frontend routes
     @app.route('/')
@@ -155,6 +165,11 @@ def create_app():
     def admin():
         """Admin dashboard"""
         return render_template('admin.html')
+    
+    @app.route('/auth-storage-demo')
+    def auth_storage_demo():
+        """V5 Authentication Storage Demo"""
+        return render_template('auth_storage_demo.html')
     
     # API info endpoint
     @app.route('/api')
@@ -230,6 +245,29 @@ def create_app():
                         'borrows': '/api/v1/borrows (uses V1)',
                         'auth': '/api/v3/auth/login (uses V3)'
                     }
+                },
+                'v5': {
+                    'status': 'active',
+                    'description': 'Authentication Storage Methods Demo',
+                    'base_url': '/api/v5',
+                    'features': [
+                        'localStorage - Persistent client storage',
+                        'sessionStorage - Session-only client storage',
+                        'HTTP-Only Cookie - Secure server-managed cookie',
+                        'Token storage comparison',
+                        'Security considerations'
+                    ],
+                    'note': 'V5 demonstrates different ways to store authentication tokens on the client side.',
+                    'endpoints': {
+                        'info': '/api/v5',
+                        'login-localstorage': '/api/v5/auth/login/localstorage',
+                        'login-sessionstorage': '/api/v5/auth/login/sessionstorage',
+                        'login-cookie': '/api/v5/auth/login/cookie',
+                        'verify': '/api/v5/auth/verify',
+                        'logout': '/api/v5/auth/logout',
+                        'protected': '/api/v5/auth/protected',
+                        'compare': '/api/v5/auth/compare'
+                    }
                 }
             },
             '_links': {
@@ -239,6 +277,7 @@ def create_app():
                 'v3': {'href': '/api/v3'},
                 'v4-cache-control': {'href': '/api/v4/cache-control'},
                 'v4-etag': {'href': '/api/v4/etag'},
+                'v5': {'href': '/api/v5'},
                 'documentation': {'href': '/api/docs'},
                 'openapi-spec': {'href': '/apispec.json'}
             }

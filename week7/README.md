@@ -24,9 +24,9 @@ python -m openapi_server
 
 ## ✨ Kết quả
 
-- 🌐 Swagger UI: http://localhost:8080/api/v1/ui/
-- 📝 API Docs: http://localhost:8080/api/v1/openapi.json
-- ⚡ API Endpoint: http://localhost:8080/api/v1/books
+- 🌐 Swagger UI: http://localhost:5001/api/v1/ui/
+- 📝 API Docs: http://localhost:5001/api/v1/openapi.json
+- ⚡ API Endpoint: http://localhost:5001/api/v1/books
 
 ## 📊 Code được sinh tự động
 
