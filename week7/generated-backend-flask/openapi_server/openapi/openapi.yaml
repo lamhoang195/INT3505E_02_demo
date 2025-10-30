@@ -1,0 +1,157 @@
+openapi: 3.0.3
+info:
+  contact:
+    email: support@bookapi.com
+    name: API Support
+  description: RESTful API for managing books with CRUD operations
+  title: Book Management API
+  version: 1.0.0
+servers:
+- description: Development server
+  url: http://localhost:5000/api/v1
+tags:
+- description: Operations related to book management
+  name: Books
+paths:
+  /books:
+    get:
+      description: Retrieve a list of all books in the system
+      operationId: controllers_books_controller_get_books
+      parameters:
+      - description: Filter books by title (partial match)
+        explode: true
+        in: query
+        name: title
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter books by author (partial match)
+        explode: true
+        in: query
+        name: author
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter by availability status
+        explode: true
+        in: query
+        name: available
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/controllers_books_controller_get_books_200_response"
+          description: Successful operation
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Internal server error
+      summary: Get all books
+      tags:
+      - Books
+      x-openapi-router-controller: openapi_server.controllers.books_controller
+components:
+  schemas:
+    Book:
+      example:
+        quantity: 5
+        author: Robert C. Martin
+        publisher: Prentice Hall
+        id: 1
+        title: Clean Code
+      properties:
+        id:
+          example: 1
+          title: id
+          type: integer
+        title:
+          example: Clean Code
+          title: title
+          type: string
+        author:
+          example: Robert C. Martin
+          title: author
+          type: string
+        publisher:
+          example: Prentice Hall
+          title: publisher
+          type: string
+        quantity:
+          example: 5
+          title: quantity
+          type: integer
+      title: Book
+      type: object
+    BookInput:
+      properties:
+        title:
+          example: Clean Code
+          type: string
+        author:
+          example: Robert C. Martin
+          type: string
+        publisher:
+          example: Prentice Hall
+          type: string
+        quantity:
+          example: 5
+          type: integer
+      required:
+      - author
+      - title
+      type: object
+    Error:
+      example:
+        success: false
+        error: Error message
+      properties:
+        success:
+          example: false
+          title: success
+          type: boolean
+        error:
+          example: Error message
+          title: error
+          type: string
+      title: Error
+      type: object
+    controllers_books_controller_get_books_200_response:
+      example:
+        data:
+        - quantity: 5
+          author: Robert C. Martin
+          publisher: Prentice Hall
+          id: 1
+          title: Clean Code
+        - quantity: 5
+          author: Robert C. Martin
+          publisher: Prentice Hall
+          id: 1
+          title: Clean Code
+        success: true
+        count: 10
+      properties:
+        success:
+          example: true
+          title: success
+          type: boolean
+        data:
+          items:
+            $ref: "#/components/schemas/Book"
+          title: data
+          type: array
+        count:
+          example: 10
+          title: count
+          type: integer
+      title: controllers_books_controller_get_books_200_response
+      type: object
