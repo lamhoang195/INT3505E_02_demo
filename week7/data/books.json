@@ -3,43 +3,22 @@
     "id": 1,
     "title": "Clean Code",
     "author": "Robert C. Martin",
-    "isbn": "978-0132350884",
     "publisher": "Prentice Hall",
-    "year": 2008,
-    "category": "Programming",
-    "quantity": 5,
-    "available": true,
-    "description": "A handbook of agile software craftsmanship",
-    "created_at": "2024-01-01T10:00:00Z",
-    "updated_at": "2024-01-01T10:00:00Z"
+    "quantity": 5
   },
   {
     "id": 2,
     "title": "The Pragmatic Programmer",
     "author": "Andrew Hunt, David Thomas",
-    "isbn": "978-0201616224",
     "publisher": "Addison-Wesley",
-    "year": 1999,
-    "category": "Programming",
-    "quantity": 3,
-    "available": true,
-    "description": "Your journey to mastery",
-    "created_at": "2024-01-02T10:00:00Z",
-    "updated_at": "2024-01-02T10:00:00Z"
+    "quantity": 3
   },
   {
     "id": 3,
     "title": "Design Patterns",
     "author": "Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides",
-    "isbn": "978-0201633610",
     "publisher": "Addison-Wesley",
-    "year": 1994,
-    "category": "Software Engineering",
-    "quantity": 0,
-    "available": false,
-    "description": "Elements of reusable object-oriented software",
-    "created_at": "2024-01-03T10:00:00Z",
-    "updated_at": "2024-01-03T10:00:00Z"
+    "quantity": 0
   }
 ]
 
