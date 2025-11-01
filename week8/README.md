@@ -9,6 +9,7 @@ Thư mục này chứa các file test cho Library Management API.
 | `test_api.py` | Unit tests cho 5 endpoints chính (9 test cases) |
 | `TEST_GUIDE.md` | Hướng dẫn chi tiết cách test (580+ dòng) |
 | `QUICK_START.md` | Hướng dẫn nhanh 5 phút ⚡ |
+| `NEWMAN_GUIDE.md` | Hướng dẫn test tự động với Newman CLI 🤖 |
 | `Library_API_Tests.postman_collection.json` | Postman collection (9 requests) |
 | `SUMMARY.md` | Tóm tắt toàn bộ nội dung week 8 |
 
@@ -32,6 +33,19 @@ python week8/test_api.py
 2. Click **Run collection** để chạy tất cả 9 requests
 3. Hoặc test từng request riêng lẻ
 
+### 3. Test Tự Động với Newman 🤖
+
+```bash
+# Cài đặt Newman (chỉ 1 lần)
+npm install -g newman
+
+# Chạy tests
+cd week8
+newman run Library_API_Tests.postman_collection.json
+```
+
+**Kết quả:** 24/24 assertions pass ✅ (9 requests, ~846ms)
+
 ## 📝 5 Endpoints Được Test
 
 | # | Method | Endpoint | Description |
@@ -46,14 +60,26 @@ python week8/test_api.py
 
 - **Bắt đầu nhanh:** `QUICK_START.md` (5 phút)
 - **Chi tiết đầy đủ:** `TEST_GUIDE.md` (hướng dẫn chi tiết)
+- **Newman/Automation:** `NEWMAN_GUIDE.md` (test tự động)
 - **Tóm tắt:** `SUMMARY.md` (overview toàn bộ)
 
 ## ✅ Test Results
 
+### Unit Tests (Python)
 ```
 Tests run: 9
 Successes: 9
 Failures: 0
 Errors: 0
 Status: ✅ ALL PASS
+```
+
+### Newman Tests (Automated)
+```
+Requests: 9/9 passed
+Assertions: 24/24 passed
+Failures: 0
+Duration: ~846ms
+Average Response: 9ms
+Status: ✅ 100% PASS
 ```
