@@ -1,0 +1,442 @@
+{
+  "info": {
+    "name": "Library Management API - Week 8 Tests",
+    "description": "Collection test cho 5 endpoints chính của Library Management System API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "12345678"
+  },
+  "item": [
+    {
+      "name": "1. GET Books List",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test status code",
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// Test response structure",
+              "pm.test(\"Response has success field\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('success');",
+              "    pm.expect(jsonData.success).to.be.true;",
+              "});",
+              "",
+              "// Test data is array",
+              "pm.test(\"Data is an array\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.data).to.be.an('array');",
+              "});",
+              "",
+              "// Test book structure",
+              "pm.test(\"Books have required fields\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    if (jsonData.data.length > 0) {",
+              "        var book = jsonData.data[0];",
+              "        pm.expect(book).to.have.property('id');",
+              "        pm.expect(book).to.have.property('title');",
+              "        pm.expect(book).to.have.property('author');",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v1/books",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "books"]
+        },
+        "description": "Lấy danh sách tất cả sách trong hệ thống"
+      },
+      "response": []
+    },
+    {
+      "name": "2. POST Create Book",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test status code",
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "// Test success",
+              "pm.test(\"Book created successfully\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.true;",
+              "    pm.expect(jsonData.data).to.have.property('id');",
+              "});",
+              "",
+              "// Test book data matches",
+              "pm.test(\"Book data is correct\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.data.title).to.eql(\"Test Book from Postman\");",
+              "    pm.expect(jsonData.data.author).to.eql(\"Test Author\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Test Book from Postman\",\n  \"author\": \"Test Author\",\n  \"isbn\": \"978-1234567890\",\n  \"quantity\": 10\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/books",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "books"]
+        },
+        "description": "Tạo sách mới trong hệ thống"
+      },
+      "response": []
+    },
+    {
+      "name": "2b. POST Create Book (Validation Error)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test status code",
+              "pm.test(\"Status code is 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "// Test validation error",
+              "pm.test(\"Validation error returned\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.false;",
+              "    pm.expect(jsonData).to.have.property('message');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Only Title - Missing Author\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/books",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "books"]
+        },
+        "description": "Test validation error khi thiếu field bắt buộc"
+      },
+      "response": []
+    },
+    {
+      "name": "3. POST Login V1",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test status code",
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// Test login success",
+              "pm.test(\"Login successful\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.true;",
+              "    pm.expect(jsonData.data).to.have.property('username');",
+              "    pm.expect(jsonData.data.username).to.eql('admin');",
+              "});",
+              "",
+              "// Test no password in response",
+              "pm.test(\"Password not in response\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.data).to.not.have.property('password');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/auth/login",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "auth", "login"]
+        },
+        "description": "Đăng nhập V1 (Client-Server, không có JWT)"
+      },
+      "response": []
+    },
+    {
+      "name": "3b. POST Login V1 (Wrong Password)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test status code",
+              "pm.test(\"Status code is 401\", function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "",
+              "// Test unauthorized",
+              "pm.test(\"Invalid credentials rejected\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.false;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"wrongpassword\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/auth/login",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "auth", "login"]
+        },
+        "description": "Test đăng nhập với mật khẩu sai"
+      },
+      "response": []
+    },
+    {
+      "name": "4. POST Login JWT (V3)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test status code",
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// Test JWT token received",
+              "pm.test(\"JWT token received\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.true;",
+              "    pm.expect(jsonData).to.have.property('token');",
+              "    pm.expect(jsonData.token_type).to.eql('Bearer');",
+              "});",
+              "",
+              "// Save token to environment",
+              "if (pm.response.code === 200) {",
+              "    var jsonData = pm.response.json();",
+              "    pm.environment.set(\"jwt_token\", jsonData.token);",
+              "    console.log(\"✓ JWT token saved to environment:\", jsonData.token.substring(0, 30) + \"...\");",
+              "}",
+              "",
+              "// Test user data",
+              "pm.test(\"User data present\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('user');",
+              "    pm.expect(jsonData.user.username).to.eql('admin');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v3/auth/login",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v3", "auth", "login"]
+        },
+        "description": "Đăng nhập V3 với JWT (Stateless). Token sẽ tự động được lưu vào environment variable."
+      },
+      "response": []
+    },
+    {
+      "name": "5. GET Verify JWT Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test status code",
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// Test token valid",
+              "pm.test(\"Token is valid\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.true;",
+              "    pm.expect(jsonData.message).to.include('valid');",
+              "});",
+              "",
+              "// Test user data from token",
+              "pm.test(\"User data decoded from token\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('user');",
+              "    pm.expect(jsonData.user).to.have.property('username');",
+              "    pm.expect(jsonData.user).to.have.property('user_id');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_token}}",
+            "description": "JWT token từ login V3"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v3/auth/verify",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v3", "auth", "verify"]
+        },
+        "description": "Xác thực JWT token. Token phải được set trong Authorization header với format: Bearer <token>"
+      },
+      "response": []
+    },
+    {
+      "name": "5b. GET Verify JWT (Invalid Token)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test status code",
+              "pm.test(\"Status code is 401\", function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "",
+              "// Test unauthorized",
+              "pm.test(\"Invalid token rejected\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.false;",
+              "    pm.expect(jsonData).to.have.property('error');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer invalid.jwt.token.here",
+            "description": "Token không hợp lệ để test"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v3/auth/verify",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v3", "auth", "verify"]
+        },
+        "description": "Test xác thực với token không hợp lệ"
+      },
+      "response": []
+    },
+    {
+      "name": "5c. GET Verify JWT (No Token)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test status code",
+              "pm.test(\"Status code is 401\", function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "",
+              "// Test token missing error",
+              "pm.test(\"Token missing error\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.false;",
+              "    pm.expect(jsonData.error.code).to.eql('TOKEN_MISSING');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v3/auth/verify",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v3", "auth", "verify"]
+        },
+        "description": "Test xác thực khi không có token trong header"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000",
+      "type": "string"
+    }
+  ]
+}
