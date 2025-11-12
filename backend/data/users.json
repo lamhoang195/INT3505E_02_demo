@@ -19,5 +19,12 @@
     "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
     "role": "user",
     "full_name": "hoang"
+  },
+  {
+    "id": "4",
+    "username": "wiener",
+    "password": "026ad9b14a7453b7488daa0c6acbc258b1506f52c441c7c465474c1a564394ff",
+    "role": "user",
+    "full_name": "hoang"
   }
 ]

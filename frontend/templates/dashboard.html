@@ -5,9 +5,25 @@
 {% block header %}Dashboard - Người dùng{% endblock %}
 
 {% block content %}
+<style>
+    #borrowModal textarea {
+        resize: vertical;
+    }
+    
+    #borrowModal small {
+        display: block;
+        margin-top: 5px;
+        font-size: 12px;
+    }
+    
+    #borrowModal .form-group {
+        margin-bottom: 15px;
+    }
+</style>
+
 <div class="nav">
-    <a href="/dashboard">Dashboard V1</a>
-    <a href="/dashboard_v2" style="background: #28a745;">Dashboard V2 (HATEOAS)</a>
+    <a href="/dashboard" style="background: #667eea;">Dashboard V6 (Donation)</a>
+    <a href="/dashboard_v2">Dashboard V2 (HATEOAS)</a>
     <a href="#" onclick="logout()">Đăng xuất</a>
 </div>
 
@@ -51,6 +67,29 @@
 <div class="card">
     <h3>Sách đang mượn</h3>
     <div id="borrowedBooks">Đang tải...</div>
+</div>
+
+<!-- Modal for Borrow with Donation -->
+<div id="borrowModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+    <div style="background-color: white; margin: 10% auto; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+        <h2 style="color: #667eea; margin-bottom: 20px;">Mượn sách: <span id="borrowBookTitle"></span></h2>
+        
+        <div class="form-group">
+            <label for="donationAmount">Số tiền donate (VNĐ) - Tùy chọn:</label>
+            <input type="number" id="donationAmount" min="0" step="1000" placeholder="Nhập số tiền (ví dụ: 50000)">
+            <small style="color: #666;">Bạn có thể donate tiền để hỗ trợ thư viện duy trì hoạt động</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="donationMessage">Lời nhắn (Tùy chọn):</label>
+            <textarea id="donationMessage" rows="3" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 14px; font-family: inherit;" placeholder="Nhập lời nhắn của bạn..."></textarea>
+        </div>
+        
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+            <button class="btn btn-secondary" onclick="closeBorrowModal()">Hủy</button>
+            <button class="btn btn-success" onclick="borrowBook()">Xác nhận mượn</button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -106,7 +145,7 @@ async function loadBooks(page = 1, search = '') {
                     <td>${book.isbn || 'N/A'}</td>
                     <td>${book.available}/${book.quantity}</td>
                     <td>
-                        <button class="btn btn-success" onclick="borrowBook('${book.id}')" ${book.available <= 0 ? 'disabled' : ''}>
+                        <button class="btn btn-success" onclick="showBorrowModal('${book.id}', '${book.title.replace(/'/g, "\\'")}')" ${book.available <= 0 ? 'disabled' : ''}>
                             Mượn sách
                         </button>
                     </td>
@@ -234,14 +273,64 @@ async function loadBorrowedBooks() {
     }
 }
 
-async function borrowBook(bookId) {
+// Modal for borrow with donation
+let currentBorrowBookId = null;
+
+function showBorrowModal(bookId, bookTitle) {
+    currentBorrowBookId = bookId;
+    document.getElementById('borrowBookTitle').textContent = bookTitle;
+    document.getElementById('donationAmount').value = '';
+    document.getElementById('donationMessage').value = '';
+    document.getElementById('borrowModal').style.display = 'block';
+}
+
+function closeBorrowModal() {
+    document.getElementById('borrowModal').style.display = 'none';
+    currentBorrowBookId = null;
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('borrowModal');
+    if (event.target == modal) {
+        closeBorrowModal();
+    }
+}
+
+async function borrowBook() {
+    if (!currentBorrowBookId) return;
+    
     try {
-        await apiCall('/borrows', 'POST', {
-            user_id: currentUser.id,
-            book_id: bookId
+        const donationAmount = parseFloat(document.getElementById('donationAmount').value) || 0;
+        const donationMessage = document.getElementById('donationMessage').value || '';
+        
+        // Use V6 API for borrow with donation
+        const response = await fetch('http://localhost:5000/api/v6/borrows', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id: currentUser.id,
+                book_id: currentBorrowBookId,
+                donation_amount: donationAmount,
+                donation_message: donationMessage
+            })
         });
         
-        showAlert('Mượn sách thành công!', 'success');
+        const result = await response.json();
+        
+        if (!result.success) {
+            throw new Error(result.message || 'An error occurred');
+        }
+        
+        let message = 'Mượn sách thành công!';
+        if (result.data.donation) {
+            message += ` Cảm ơn bạn đã donate ${result.data.donation.amount.toLocaleString('vi-VN')} VNĐ cho thư viện!`;
+        }
+        
+        showAlert(message, 'success');
+        closeBorrowModal();
         loadBooks();
         loadBorrowedBooks();
         

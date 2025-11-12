@@ -5,7 +5,7 @@
     "author": "Hoàng",
     "isbn": "122321",
     "quantity": 4,
-    "available": 4
+    "available": 1
   },
   {
     "id": "2",
@@ -13,7 +13,7 @@
     "author": "2",
     "isbn": "2",
     "quantity": 1,
-    "available": 1
+    "available": 0
   },
   {
     "id": "3",
@@ -21,7 +21,7 @@
     "author": "2",
     "isbn": "2",
     "quantity": 1,
-    "available": 1
+    "available": 0
   },
   {
     "id": "4",
@@ -177,6 +177,22 @@
   },
   {
     "id": "23",
+    "title": "Test Book from Postman",
+    "author": "Test Author",
+    "isbn": "978-1234567890",
+    "quantity": 10,
+    "available": 10
+  },
+  {
+    "id": "24",
+    "title": "Test Book from Postman",
+    "author": "Test Author",
+    "isbn": "978-1234567890",
+    "quantity": 10,
+    "available": 10
+  },
+  {
+    "id": "25",
     "title": "Test Book from Postman",
     "author": "Test Author",
     "isbn": "978-1234567890",

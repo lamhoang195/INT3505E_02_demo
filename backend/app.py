@@ -24,6 +24,9 @@ from backend.api.v4.books_etag import books_v4_etag
 # Import V5 API blueprints
 from backend.api.v5.auth_storage import auth_storage_v5
 
+# Import V6 API blueprints
+from backend.api.v6.borrows import borrows_v6
+
 def create_app():
     """Create and configure Flask application"""
     app = Flask(__name__, 
@@ -103,6 +106,10 @@ def create_app():
             {
                 "name": "V5 - Auth Storage Demo",
                 "description": "API V5 - Demo các phương pháp lưu trữ token (localStorage, sessionStorage, HTTP-Only Cookie)"
+            },
+            {
+                "name": "V6 - Borrows with Donation",
+                "description": "API V6 - Mượn sách với chức năng donate tiền cho thư viện"
             }
         ],
         "securityDefinitions": {
@@ -134,6 +141,9 @@ def create_app():
     
     # Register V5 API blueprints
     app.register_blueprint(auth_storage_v5)
+    
+    # Register V6 API blueprints
+    app.register_blueprint(borrows_v6)
     
     # Frontend routes
     @app.route('/')
@@ -268,6 +278,23 @@ def create_app():
                         'protected': '/api/v5/auth/protected',
                         'compare': '/api/v5/auth/compare'
                     }
+                },
+                'v6': {
+                    'status': 'active',
+                    'description': 'Borrow with Donation Feature',
+                    'base_url': '/api/v6',
+                    'features': [
+                        'Borrow books with optional donation',
+                        'Donate money to library when borrowing',
+                        'Track donations',
+                        'View donation history'
+                    ],
+                    'note': 'V6 extends borrow functionality with donation feature.',
+                    'endpoints': {
+                        'info': '/api/v6',
+                        'borrows': '/api/v6/borrows (POST - borrow with donation)',
+                        'donations': '/api/v6/donations (GET - list donations)'
+                    }
                 }
             },
             '_links': {
@@ -278,6 +305,7 @@ def create_app():
                 'v4-cache-control': {'href': '/api/v4/cache-control'},
                 'v4-etag': {'href': '/api/v4/etag'},
                 'v5': {'href': '/api/v5'},
+                'v6': {'href': '/api/v6'},
                 'documentation': {'href': '/api/docs'},
                 'openapi-spec': {'href': '/apispec.json'}
             }

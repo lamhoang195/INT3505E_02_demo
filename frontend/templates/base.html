@@ -203,9 +203,14 @@
         // Update version badge based on current page
         window.addEventListener('DOMContentLoaded', function() {
             const badge = document.getElementById('versionBadge');
-            if (badge && window.location.pathname.includes('v2')) {
-                badge.textContent = 'API V2 - Uniform Interface';
-                badge.style.background = '#28a745';
+            if (badge) {
+                if (window.location.pathname.includes('v2')) {
+                    badge.textContent = 'API V2 - Uniform Interface';
+                    badge.style.background = '#28a745';
+                } else if (window.location.pathname === '/dashboard') {
+                    badge.textContent = 'API V6 - Borrow with Donation';
+                    badge.style.background = '#667eea';
+                }
             }
         });
         
