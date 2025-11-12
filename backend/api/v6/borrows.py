@@ -2,7 +2,7 @@
 V6 Borrows Controller - Borrow with Donation Feature
 Khi mượn sách, người dùng có thể donate tiền cho thư viện
 """
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, make_response
 from flasgger import swag_from
 from backend.services.borrow_service import BorrowService
 from backend.services.book_service import BookService
@@ -17,18 +17,38 @@ donation_service = DonationService()
 @borrows_v6.route('/api/v6', methods=['GET'])
 def v6_info():
     """API V6 Information"""
-    return jsonify({
+    response = make_response(jsonify({
         'version': 'v6',
         'name': 'Borrow with Donation',
+        'status': 'deprecated',
+        'sunset_date': '2025-12-31',
+        'deprecation_reason': 'Thư viện không còn cần chức năng donate từ người dùng. Thư viện đã đủ nguồn tài chính để duy trì hoạt động và muốn đơn giản hóa quy trình mượn sách.',
+        'deprecation_notice': 'API V6 sẽ ngừng hoạt động sau 31/12/2025. Không phát triển tính năng mới trên phiên bản này và hãy chuẩn bị kế hoạch migrate sang phiên bản kế nhiệm.',
         'description': 'Mượn sách với chức năng donate tiền cho thư viện',
         'features': ['Borrow books', 'Optional donation when borrowing'],
         'endpoints': {
             'borrows': {
                 'create': 'POST /api/v6/borrows',
                 'description': 'Mượn sách với tùy chọn donate'
+            },
+            'donations': {
+                'list': 'GET /api/v6/donations',
+                'description': 'Liệt kê các khoản donate đã ghi nhận'
             }
-        }
-    }), 200
+        },
+        'migration': {
+            'recommended': 'API V1',
+            'endpoint': '/api/v1/borrows',
+            'note': 'Sử dụng API V1 cho chức năng mượn sách cơ bản. Không cần donation_amount và donation_message.'
+        },
+        'documentation': 'Xem README.md trong backend/api/v6/ để biết thêm chi tiết về deprecation và migration guide.',
+        'warning': '⚠️ DEPRECATED: API V6 đã được đánh dấu là deprecated và sẽ ngừng hoạt động sau 31/12/2025.'
+    }))
+    # Add deprecation headers (RFC 8594)
+    response.headers['Deprecation'] = 'true'
+    response.headers['Sunset'] = 'Tue, 31 Dec 2025 23:59:59 GMT'
+    response.headers['Link'] = '</api>; rel="deprecation"; type="text/html"'
+    return response
 
 @borrows_v6.route('/api/v6/borrows', methods=['POST'])
 def create_borrow_with_donation():
@@ -36,7 +56,12 @@ def create_borrow_with_donation():
     Mượn sách với chức năng donate tiền cho thư viện
     ---
     tags:
-      - V6 - Borrows with Donation
+      - V6 - Borrows with Donation (Deprecated)
+    deprecated: true
+    summary: "[Deprecated] Mượn sách với chức năng donate"
+    description: >
+      API V6 sẽ ngừng hoạt động sau 31/12/2025. Không phát triển tính năng mới trên phiên bản này. 
+      Vui lòng sử dụng các phiên bản thay thế được khuyến nghị khi có sẵn.
     parameters:
       - name: body
         in: body
@@ -145,11 +170,18 @@ def create_borrow_with_donation():
         if donation:
             response_data['donation'] = donation
         
-        return jsonify({
+        response = make_response(jsonify({
             'success': True,
             'data': response_data,
-            'message': 'Book borrowed successfully' + (' with donation' if donation else '')
-        }), 201
+            'message': 'Book borrowed successfully' + (' with donation' if donation else ''),
+            'deprecation_warning': '⚠️ API V6 is deprecated and will be sunset on 2025-12-31. Please migrate to a newer version.'
+        }))
+        # Add deprecation headers (RFC 8594)
+        response.headers['Deprecation'] = 'true'
+        response.headers['Sunset'] = 'Tue, 31 Dec 2025 23:59:59 GMT'
+        response.headers['Link'] = '</api>; rel="deprecation"; type="text/html"'
+        response.status_code = 201
+        return response
     
     except Exception as e:
         return jsonify({
@@ -163,7 +195,11 @@ def get_donations():
     Lấy danh sách donations
     ---
     tags:
-      - V6 - Borrows with Donation
+      - V6 - Borrows with Donation (Deprecated)
+    deprecated: true
+    summary: "[Deprecated] Danh sách donations của V6"
+    description: >
+      API V6 sẽ ngừng hoạt động sau 31/12/2025. Không phát triển tính năng mới trên phiên bản này.
     parameters:
       - name: user_id
         in: query
@@ -181,9 +217,15 @@ def get_donations():
     else:
         donations = donation_service.get_all_donations()
     
-    return jsonify({
+    response = make_response(jsonify({
         'success': True,
         'data': donations,
-        'total_amount': donation_service.get_total_donations()
-    }), 200
+        'total_amount': donation_service.get_total_donations(),
+        'deprecation_warning': '⚠️ API V6 is deprecated and will be sunset on 2025-12-31. Please migrate to a newer version.'
+    }))
+    # Add deprecation headers (RFC 8594)
+    response.headers['Deprecation'] = 'true'
+    response.headers['Sunset'] = 'Tue, 31 Dec 2025 23:59:59 GMT'
+    response.headers['Link'] = '</api>; rel="deprecation"; type="text/html"'
+    return response
 

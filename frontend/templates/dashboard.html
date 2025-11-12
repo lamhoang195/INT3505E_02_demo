@@ -27,6 +27,22 @@
     <a href="#" onclick="logout()">Đăng xuất</a>
 </div>
 
+<!-- Deprecation Warning Banner -->
+<div id="deprecationWarning" style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 15px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px;">
+    <div style="font-size: 24px;">⚠️</div>
+    <div style="flex: 1;">
+        <strong style="color: #856404; font-size: 16px;">API V6 Deprecated</strong>
+        <p style="color: #856404; margin: 5px 0 0 0; font-size: 14px;">
+            API V6 sẽ ngừng hoạt động sau <strong>31/12/2025</strong>. 
+            Không phát triển tính năng mới trên phiên bản này và hãy chuẩn bị migrate sang phiên bản kế nhiệm.
+        </p>
+    </div>
+    <button onclick="document.getElementById('deprecationWarning').style.display='none'" 
+            style="background: #856404; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 12px;">
+        ✕ Đóng
+    </button>
+</div>
+
 <div id="userInfo" class="card">
     <h3>Thông tin người dùng</h3>
     <p id="userDetails">Đang tải...</p>
@@ -73,6 +89,13 @@
 <div id="borrowModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
     <div style="background-color: white; margin: 10% auto; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
         <h2 style="color: #667eea; margin-bottom: 20px;">Mượn sách: <span id="borrowBookTitle"></span></h2>
+        
+        <!-- Deprecation notice in modal -->
+        <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px; margin-bottom: 20px; border-radius: 4px;">
+            <small style="color: #856404; font-size: 12px;">
+                ⚠️ <strong>Lưu ý:</strong> API V6 đã deprecated và sẽ ngừng hoạt động sau 31/12/2025
+            </small>
+        </div>
         
         <div class="form-group">
             <label for="donationAmount">Số tiền donate (VNĐ) - Tùy chọn:</label>
@@ -305,6 +328,8 @@ async function borrowBook() {
         const donationMessage = document.getElementById('donationMessage').value || '';
         
         // Use V6 API for borrow with donation
+        console.warn('⚠️ [DEPRECATED] Đang sử dụng API V6 - API này sẽ ngừng hoạt động sau 31/12/2025');
+        
         const response = await fetch('http://localhost:5000/api/v6/borrows', {
             method: 'POST',
             headers: {
@@ -318,15 +343,36 @@ async function borrowBook() {
             })
         });
         
+        // Check for deprecation headers
+        const deprecationHeader = response.headers.get('Deprecation');
+        const sunsetHeader = response.headers.get('Sunset');
+        
+        if (deprecationHeader === 'true') {
+            console.warn('⚠️ [DEPRECATED API] Response có header Deprecation: true');
+            if (sunsetHeader) {
+                console.warn(`⚠️ [SUNSET DATE] API sẽ ngừng hoạt động vào: ${sunsetHeader}`);
+            }
+        }
+        
         const result = await response.json();
         
         if (!result.success) {
             throw new Error(result.message || 'An error occurred');
         }
         
+        // Show deprecation warning if present in response
+        if (result.deprecation_warning) {
+            console.warn('⚠️', result.deprecation_warning);
+        }
+        
         let message = 'Mượn sách thành công!';
         if (result.data.donation) {
             message += ` Cảm ơn bạn đã donate ${result.data.donation.amount.toLocaleString('vi-VN')} VNĐ cho thư viện!`;
+        }
+        
+        // Add deprecation notice to success message
+        if (deprecationHeader === 'true') {
+            message += ' (⚠️ API V6 deprecated - sẽ ngừng hoạt động sau 31/12/2025)';
         }
         
         showAlert(message, 'success');

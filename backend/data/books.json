@@ -5,7 +5,7 @@
     "author": "Hoàng",
     "isbn": "122321",
     "quantity": 4,
-    "available": 1
+    "available": 3
   },
   {
     "id": "2",
@@ -13,7 +13,7 @@
     "author": "2",
     "isbn": "2",
     "quantity": 1,
-    "available": 0
+    "available": 1
   },
   {
     "id": "3",
@@ -21,7 +21,7 @@
     "author": "2",
     "isbn": "2",
     "quantity": 1,
-    "available": 0
+    "available": 1
   },
   {
     "id": "4",

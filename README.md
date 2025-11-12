@@ -23,6 +23,12 @@ Dự án này demo các nguyên tắc REST API theo cách tiếp cận từng b�
 | **V2** | Uniform Interface | HATEOAS, Self-descriptive messages |
 | **V3** | Stateless | JWT Authentication, không lưu session |
 | **V4** | Cacheable | Cache-Control headers, ETag, Conditional requests |
+| **V5** | Security Best Practices | So sánh lưu trữ token (localStorage, sessionStorage, HTTP-Only Cookie) |
+| **V6** | Client-Server (Deprecated) | Mượn sách kèm donate (sẽ ngừng hỗ trợ sau 31/12/2025) |
+
+## ⚠️ Deprecation Notice
+
+- **V6 - Borrow with Donation**: sẽ ngừng hoạt động sau **31/12/2025**. Developers không nên triển khai tính năng mới phụ thuộc vào V6 và nên chuẩn bị migrate sang phiên bản kế nhiệm khi có thông báo chính thức.
 
 ## 🏗️ Kiến trúc
 

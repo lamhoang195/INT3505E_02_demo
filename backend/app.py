@@ -108,8 +108,8 @@ def create_app():
                 "description": "API V5 - Demo các phương pháp lưu trữ token (localStorage, sessionStorage, HTTP-Only Cookie)"
             },
             {
-                "name": "V6 - Borrows with Donation",
-                "description": "API V6 - Mượn sách với chức năng donate tiền cho thư viện"
+                "name": "V6 - Borrows with Donation (Deprecated)",
+                "description": "API V6 - Mượn sách với chức năng donate tiền cho thư viện (Deprecated - sẽ ngừng hỗ trợ sau 31/12/2025)"
             }
         ],
         "securityDefinitions": {
@@ -280,8 +280,9 @@ def create_app():
                     }
                 },
                 'v6': {
-                    'status': 'active',
-                    'description': 'Borrow with Donation Feature',
+                    'status': 'deprecated',
+                    'sunset_date': '2025-12-31',
+                    'description': 'Borrow with Donation Feature (Deprecated)',
                     'base_url': '/api/v6',
                     'features': [
                         'Borrow books with optional donation',
@@ -289,7 +290,8 @@ def create_app():
                         'Track donations',
                         'View donation history'
                     ],
-                    'note': 'V6 extends borrow functionality with donation feature.',
+                    'note': 'V6 sẽ ngừng hoạt động sau 31/12/2025. Không phát triển tính năng mới trên phiên bản này.',
+                    'deprecation_notice': 'Vui lòng chuẩn bị migrate các workflow sử dụng V6 sang phiên bản mới hơn khi có thông báo chính thức.',
                     'endpoints': {
                         'info': '/api/v6',
                         'borrows': '/api/v6/borrows (POST - borrow with donation)',

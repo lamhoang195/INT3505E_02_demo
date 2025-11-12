@@ -86,8 +86,8 @@
     "book_id": "1",
     "borrow_date": "2025-11-12T18:57:10.736321",
     "due_date": "2025-11-26T18:57:10.736321",
-    "return_date": null,
-    "status": "borrowed"
+    "return_date": "2025-11-12T19:03:45.005284",
+    "status": "returned"
   },
   {
     "id": "11",
@@ -95,8 +95,8 @@
     "book_id": "2",
     "borrow_date": "2025-11-12T18:57:31.426627",
     "due_date": "2025-11-26T18:57:31.426627",
-    "return_date": null,
-    "status": "borrowed"
+    "return_date": "2025-11-12T19:03:46.797850",
+    "status": "returned"
   },
   {
     "id": "12",
@@ -104,8 +104,8 @@
     "book_id": "1",
     "borrow_date": "2025-11-12T18:57:34.561404",
     "due_date": "2025-11-26T18:57:34.561404",
-    "return_date": null,
-    "status": "borrowed"
+    "return_date": "2025-11-12T19:03:51.600051",
+    "status": "returned"
   },
   {
     "id": "13",
@@ -113,8 +113,8 @@
     "book_id": "1",
     "borrow_date": "2025-11-12T18:57:35.140772",
     "due_date": "2025-11-26T18:57:35.140772",
-    "return_date": null,
-    "status": "borrowed"
+    "return_date": "2025-11-12T19:03:48.336668",
+    "status": "returned"
   },
   {
     "id": "14",
@@ -122,6 +122,42 @@
     "book_id": "3",
     "borrow_date": "2025-11-12T18:57:48.500365",
     "due_date": "2025-11-26T18:57:48.500365",
+    "return_date": "2025-11-12T19:03:52.833354",
+    "status": "returned"
+  },
+  {
+    "id": "15",
+    "user_id": "2",
+    "book_id": "1",
+    "borrow_date": "2025-11-12T19:02:37.017805",
+    "due_date": "2025-11-26T19:02:37.017805",
+    "return_date": "2025-11-12T19:03:01.787166",
+    "status": "returned"
+  },
+  {
+    "id": "16",
+    "user_id": "2",
+    "book_id": "4",
+    "borrow_date": "2025-11-12T19:03:11.520998",
+    "due_date": "2025-11-26T19:03:11.520998",
+    "return_date": "2025-11-12T19:03:17.056340",
+    "status": "returned"
+  },
+  {
+    "id": "17",
+    "user_id": "4",
+    "book_id": "1",
+    "borrow_date": "2025-11-12T19:04:52.350493",
+    "due_date": "2025-11-26T19:04:52.350493",
+    "return_date": "2025-11-12T19:04:55.940878",
+    "status": "returned"
+  },
+  {
+    "id": "18",
+    "user_id": "4",
+    "book_id": "1",
+    "borrow_date": "2025-11-12T19:05:28.277472",
+    "due_date": "2025-11-26T19:05:28.277472",
     "return_date": null,
     "status": "borrowed"
   }
