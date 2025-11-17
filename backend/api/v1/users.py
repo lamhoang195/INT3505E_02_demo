@@ -3,17 +3,21 @@ V1 Users Controller - Client-Server architecture
 Simple user management operations
 """
 import logging
+import os
 
 from flask import Blueprint, request, jsonify
 
+from backend.extensions import limiter
 from backend.services.user_service import UserService
 
 # Create blueprint for V1 users
 users_v1 = Blueprint('users_v1', __name__)
 user_service = UserService()
 logger = logging.getLogger(__name__)
+V1_RATE_LIMIT = os.getenv('V1_RATE_LIMIT', '60/minute')
 
 @users_v1.route('/api/v1/users', methods=['GET'])
+@limiter.limit(V1_RATE_LIMIT)
 def get_users():
     """
     Lấy danh sách tất cả người dùng
@@ -55,6 +59,7 @@ def get_users():
     }), 200
 
 @users_v1.route('/api/v1/users/<user_id>', methods=['GET'])
+@limiter.limit(V1_RATE_LIMIT)
 def get_user(user_id):
     """Get a specific user"""
     logger.info("Fetching user id=%s", user_id)
@@ -71,6 +76,7 @@ def get_user(user_id):
     }), 404
 
 @users_v1.route('/api/v1/users', methods=['POST'])
+@limiter.limit(V1_RATE_LIMIT)
 def create_user():
     """
     Đăng ký người dùng mới
@@ -180,6 +186,7 @@ def create_user():
         }), 500
 
 @users_v1.route('/api/v1/auth/login', methods=['POST'])
+@limiter.limit(V1_RATE_LIMIT)
 def login():
     """
     Đăng nhập
@@ -285,6 +292,7 @@ def login():
         }), 500
 
 @users_v1.route('/api/v1/users/<user_id>', methods=['PUT'])
+@limiter.limit(V1_RATE_LIMIT)
 def update_user(user_id):
     """Update a user"""
     try:
@@ -313,6 +321,7 @@ def update_user(user_id):
         }), 500
 
 @users_v1.route('/api/v1/users/<user_id>', methods=['DELETE'])
+@limiter.limit(V1_RATE_LIMIT)
 def delete_user(user_id):
     """Delete a user"""
     try:

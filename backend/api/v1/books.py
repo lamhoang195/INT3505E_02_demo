@@ -3,17 +3,21 @@ V1 Books Controller - Client-Server architecture
 Simple CRUD operations for books
 """
 import logging
+import os
 
 from flask import Blueprint, request, jsonify
 
+from backend.extensions import limiter
 from backend.services.book_service import BookService
 
 # Create blueprint for V1 books
 books_v1 = Blueprint('books_v1', __name__)
 book_service = BookService()
 logger = logging.getLogger(__name__)
+V1_RATE_LIMIT = os.getenv('V1_RATE_LIMIT', '60/minute')
 
 @books_v1.route('/api/v1', methods=['GET'])
+@limiter.limit(V1_RATE_LIMIT)
 def v1_info():
     """API V1 Information"""
     return jsonify({
@@ -55,6 +59,7 @@ def v1_info():
     }), 200
 
 @books_v1.route('/api/v1/books', methods=['GET'])
+@limiter.limit(V1_RATE_LIMIT)
 def get_books():
     """
     Lấy danh sách tất cả sách
@@ -102,6 +107,7 @@ def get_books():
     }), 200
 
 @books_v1.route('/api/v1/books/search', methods=['GET'])
+@limiter.limit(V1_RATE_LIMIT)
 def search_books():
     """
     Tìm kiếm và phân trang sách
@@ -244,6 +250,7 @@ def search_books():
         }), 400
 
 @books_v1.route('/api/v1/books/<book_id>', methods=['GET'])
+@limiter.limit(V1_RATE_LIMIT)
 def get_book(book_id):
     """
     Lấy thông tin sách theo ID
@@ -313,6 +320,7 @@ def get_book(book_id):
     }), 404
 
 @books_v1.route('/api/v1/books', methods=['POST'])
+@limiter.limit(V1_RATE_LIMIT)
 def create_book():
     """
     Tạo sách mới
@@ -420,6 +428,7 @@ def create_book():
         }), 500
 
 @books_v1.route('/api/v1/books/<book_id>', methods=['PUT'])
+@limiter.limit(V1_RATE_LIMIT)
 def update_book(book_id):
     """
     Cập nhật thông tin sách
@@ -500,6 +509,7 @@ def update_book(book_id):
         }), 500
 
 @books_v1.route('/api/v1/books/<book_id>', methods=['DELETE'])
+@limiter.limit(V1_RATE_LIMIT)
 def delete_book(book_id):
     """
     Xóa sách

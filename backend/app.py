@@ -11,6 +11,7 @@ from flask import Flask, render_template, request, Response
 from flask_cors import CORS
 from flasgger import Swagger
 from prometheus_client import Counter, Histogram, CONTENT_TYPE_LATEST, generate_latest
+from backend.extensions import limiter
 
 # Import V1 API blueprints
 from backend.api.v1.books import books_v1
@@ -96,10 +97,14 @@ def create_app():
     
     # Enable CORS for API requests
     CORS(app)
+
+    # Initialize extensions
+    limiter.init_app(app)
     
     # Configure app
     app.config['JSON_AS_ASCII'] = False
     app.config['SECRET_KEY'] = 'your-secret-key-here'
+    app.config.setdefault('V1_RATE_LIMIT', os.getenv('V1_RATE_LIMIT', '60/minute'))
     
     # Configure Swagger/OpenAPI
     swagger_config = {

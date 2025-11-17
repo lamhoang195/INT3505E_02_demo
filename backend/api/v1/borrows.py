@@ -3,9 +3,11 @@ V1 Borrows Controller - Client-Server architecture
 Simple borrow/return operations
 """
 import logging
+import os
 
 from flask import Blueprint, request, jsonify
 
+from backend.extensions import limiter
 from backend.services.borrow_service import BorrowService
 from backend.services.book_service import BookService
 
@@ -14,8 +16,10 @@ borrows_v1 = Blueprint('borrows_v1', __name__)
 borrow_service = BorrowService()
 book_service = BookService()
 logger = logging.getLogger(__name__)
+V1_RATE_LIMIT = os.getenv('V1_RATE_LIMIT', '60/minute')
 
 @borrows_v1.route('/api/v1/borrows', methods=['GET'])
+@limiter.limit(V1_RATE_LIMIT)
 def get_borrows():
     """
     Lấy danh sách phiếu mượn sách
@@ -92,6 +96,7 @@ def get_borrows():
     }), 200
 
 @borrows_v1.route('/api/v1/borrows/<borrow_id>', methods=['GET'])
+@limiter.limit(V1_RATE_LIMIT)
 def get_borrow(borrow_id):
     """Get a specific borrow record"""
     logger.info("Fetching borrow record id=%s", borrow_id)
@@ -108,6 +113,7 @@ def get_borrow(borrow_id):
     }), 404
 
 @borrows_v1.route('/api/v1/borrows', methods=['POST'])
+@limiter.limit(V1_RATE_LIMIT)
 def create_borrow():
     """
     Mượn sách
@@ -240,6 +246,7 @@ def create_borrow():
         }), 500
 
 @borrows_v1.route('/api/v1/borrows/<borrow_id>/return', methods=['POST'])
+@limiter.limit(V1_RATE_LIMIT)
 def return_book(borrow_id):
     """
     Trả sách
@@ -347,6 +354,7 @@ def return_book(borrow_id):
         }), 500
 
 @borrows_v1.route('/api/v1/borrows/history', methods=['GET'])
+@limiter.limit(V1_RATE_LIMIT)
 def get_history():
     """Get borrow history"""
     user_id = request.args.get('user_id')
