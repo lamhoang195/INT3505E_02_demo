@@ -2,13 +2,16 @@
 V1 Books Controller - Client-Server architecture
 Simple CRUD operations for books
 """
+import logging
+
 from flask import Blueprint, request, jsonify
-from flasgger import swag_from
+
 from backend.services.book_service import BookService
 
 # Create blueprint for V1 books
 books_v1 = Blueprint('books_v1', __name__)
 book_service = BookService()
+logger = logging.getLogger(__name__)
 
 @books_v1.route('/api/v1', methods=['GET'])
 def v1_info():
@@ -92,6 +95,7 @@ def get_books():
                     example: 3
     """
     books = book_service.get_all_books()
+    logger.info("Fetched %d books", len(books))
     return jsonify({
         'success': True,
         'data': books
@@ -199,14 +203,21 @@ def search_books():
         page = int(request.args.get('page', 1))
         per_page = int(request.args.get('per_page', 10))
         
+        logger.info(
+            "Searching books with params search=%s page=%s per_page=%s",
+            search, page, per_page
+        )
+
         # Validate parameters
         if page < 1:
+            logger.warning("Invalid page parameter: %s", page)
             return jsonify({
                 'success': False,
                 'error': 'Page must be greater than 0'
             }), 400
         
         if per_page < 1 or per_page > 100:
+            logger.warning("Invalid per_page parameter: %s", per_page)
             return jsonify({
                 'success': False,
                 'error': 'Per_page must be between 1 and 100'
@@ -215,12 +226,18 @@ def search_books():
         # Get paginated results
         result = book_service.search_and_paginate_books(search, page, per_page)
         
+        logger.info(
+            "Search returned %d items (page %s)",
+            len(result.get('items', [])), result.get('pagination', {}).get('page')
+        )
+
         return jsonify({
             'success': True,
             'data': result
         }), 200
         
     except ValueError:
+        logger.exception("Invalid pagination parameters")
         return jsonify({
             'success': False,
             'error': 'Invalid parameters: page and per_page must be integers'
@@ -282,12 +299,14 @@ def get_book(book_id):
               type: string
               example: "Book not found"
     """
+    logger.info("Fetching book detail for id=%s", book_id)
     book = book_service.get_book_by_id(book_id)
     if book:
         return jsonify({
             'success': True,
             'data': book
         }), 200
+    logger.warning("Book id=%s not found", book_id)
     return jsonify({
         'success': False,
         'message': 'Book not found'
@@ -379,12 +398,14 @@ def create_book():
         
         # Validate required fields
         if not data.get('title') or not data.get('author'):
+            logger.warning("Book creation missing required fields: %s", data)
             return jsonify({
                 'success': False,
                 'message': 'Title and author are required'
             }), 400
         
         book = book_service.create_book(data)
+        logger.info("Created book id=%s title=%s", book['id'], book['title'])
         return jsonify({
             'success': True,
             'data': book,
@@ -392,6 +413,7 @@ def create_book():
         }), 201
     
     except Exception as e:
+        logger.exception("Failed to create book")
         return jsonify({
             'success': False,
             'message': str(e)
@@ -457,18 +479,21 @@ def update_book(book_id):
         book = book_service.update_book(book_id, data)
         
         if book:
+            logger.info("Updated book id=%s", book_id)
             return jsonify({
                 'success': True,
                 'data': book,
                 'message': 'Book updated successfully'
             }), 200
         
+        logger.warning("Attempted to update missing book id=%s", book_id)
         return jsonify({
             'success': False,
             'message': 'Book not found'
         }), 404
     
     except Exception as e:
+        logger.exception("Failed to update book id=%s", book_id)
         return jsonify({
             'success': False,
             'message': str(e)
@@ -518,17 +543,20 @@ def delete_book(book_id):
         success = book_service.delete_book(book_id)
         
         if success:
+            logger.info("Deleted book id=%s", book_id)
             return jsonify({
                 'success': True,
                 'message': 'Book deleted successfully'
             }), 200
         
+        logger.warning("Attempted to delete missing book id=%s", book_id)
         return jsonify({
             'success': False,
             'message': 'Book not found'
         }), 404
     
     except Exception as e:
+        logger.exception("Failed to delete book id=%s", book_id)
         return jsonify({
             'success': False,
             'message': str(e)

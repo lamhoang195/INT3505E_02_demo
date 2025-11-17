@@ -2,9 +2,15 @@
 Main Flask Application
 Registers all API versions
 """
-from flask import Flask, render_template
+import logging
+import os
+import time
+from logging.config import dictConfig
+
+from flask import Flask, render_template, request, Response
 from flask_cors import CORS
 from flasgger import Swagger
+from prometheus_client import Counter, Histogram, CONTENT_TYPE_LATEST, generate_latest
 
 # Import V1 API blueprints
 from backend.api.v1.books import books_v1
@@ -26,6 +32,61 @@ from backend.api.v5.auth_storage import auth_storage_v5
 
 # Import V6 API blueprints
 from backend.api.v6.borrows import borrows_v6
+
+
+def _configure_logging():
+    """Configure application-wide logging."""
+    log_level = os.getenv('APP_LOG_LEVEL', 'INFO')
+    log_dir = os.path.join(os.path.dirname(__file__), 'logs')
+    os.makedirs(log_dir, exist_ok=True)
+
+    dictConfig({
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'default': {
+                'format': '[%(asctime)s] %(levelname)s in %(name)s: %(message)s'
+            }
+        },
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'default',
+                'level': log_level
+            },
+            'file': {
+                'class': 'logging.handlers.RotatingFileHandler',
+                'formatter': 'default',
+                'level': log_level,
+                'filename': os.path.join(log_dir, 'app.log'),
+                'maxBytes': 5 * 1024 * 1024,
+                'backupCount': 3,
+                'encoding': 'utf-8'
+            }
+        },
+        'root': {
+            'level': log_level,
+            'handlers': ['console', 'file']
+        }
+    })
+
+
+_configure_logging()
+logger = logging.getLogger(__name__)
+
+# Prometheus metrics for V1 API
+REQUEST_COUNT = Counter(
+    'v1_api_requests_total',
+    'Total number of requests to V1 API endpoints',
+    ['method', 'endpoint', 'status_code']
+)
+
+REQUEST_LATENCY = Histogram(
+    'v1_api_request_duration_seconds',
+    'Latency of V1 API endpoints in seconds',
+    ['method', 'endpoint']
+)
+
 
 def create_app():
     """Create and configure Flask application"""
@@ -145,6 +206,43 @@ def create_app():
     # Register V6 API blueprints
     app.register_blueprint(borrows_v6)
     
+    logger.info("Flask application configured with logging and Prometheus metrics.")
+
+    @app.before_request
+    def start_timer():
+        """Record start time for V1 API requests."""
+        if request.path.startswith('/api/v1'):
+            request._v1_request_start_time = time.perf_counter()
+
+    @app.after_request
+    def record_metrics(response):
+        """Record metrics for V1 API requests."""
+        if request.path.startswith('/api/v1'):
+            endpoint = request.endpoint or 'unknown'
+            method = request.method
+            status_code = response.status_code
+
+            REQUEST_COUNT.labels(
+                method=method,
+                endpoint=endpoint,
+                status_code=status_code
+            ).inc()
+
+            start_time = getattr(request, '_v1_request_start_time', None)
+            if start_time is not None:
+                duration = time.perf_counter() - start_time
+                REQUEST_LATENCY.labels(
+                    method=method,
+                    endpoint=endpoint
+                ).observe(duration)
+
+        return response
+
+    @app.route('/metrics')
+    def metrics():
+        """Expose Prometheus metrics."""
+        return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)
+
     # Frontend routes
     @app.route('/')
     def index():
@@ -185,7 +283,7 @@ def create_app():
     @app.route('/api')
     def api_info():
         """API information"""
-        return {
+        info = {
             'name': 'Library Management System API',
             'description': 'RESTful API demonstrating REST architectural constraints',
             'versions': {
@@ -312,6 +410,8 @@ def create_app():
                 'openapi-spec': {'href': '/apispec.json'}
             }
         }
+        logger.info("API info requested")
+        return info
     
     return app
 
