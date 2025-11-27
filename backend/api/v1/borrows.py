@@ -10,11 +10,13 @@ from flask import Blueprint, request, jsonify
 from backend.extensions import limiter
 from backend.services.borrow_service import BorrowService
 from backend.services.book_service import BookService
+from backend.services.webhook_service import WebhookService
 
 # Create blueprint for V1 borrows
 borrows_v1 = Blueprint('borrows_v1', __name__)
 borrow_service = BorrowService()
 book_service = BookService()
+webhook_service = WebhookService()
 logger = logging.getLogger(__name__)
 V1_RATE_LIMIT = os.getenv('V1_RATE_LIMIT', '60/minute')
 
@@ -231,6 +233,19 @@ def create_borrow():
             "Created borrow record id=%s for user=%s book=%s",
             borrow['id'], borrow['user_id'], borrow['book_id']
         )
+        
+        # Trigger webhook notification
+        try:
+            webhook_service.notify('book.borrowed', {
+                'borrow_id': borrow['id'],
+                'user_id': borrow['user_id'],
+                'book_id': borrow['book_id'],
+                'book_title': book.get('title', 'Unknown'),
+                'borrow_date': borrow['borrow_date'],
+                'due_date': borrow['due_date']
+            })
+        except Exception as e:
+            logger.warning("Failed to send webhook notification: %s", str(e))
 
         return jsonify({
             'success': True,
@@ -339,6 +354,20 @@ def return_book(borrow_id):
         book_service.update_availability(borrow['book_id'], 1)
         
         logger.info("Borrow record id=%s marked as returned", borrow_id)
+        
+        # Trigger webhook notification
+        try:
+            book = book_service.get_book_by_id(borrow['book_id'])
+            webhook_service.notify('book.returned', {
+                'borrow_id': updated_borrow['id'],
+                'user_id': updated_borrow['user_id'],
+                'book_id': updated_borrow['book_id'],
+                'book_title': book.get('title', 'Unknown') if book else 'Unknown',
+                'borrow_date': updated_borrow['borrow_date'],
+                'return_date': updated_borrow['return_date']
+            })
+        except Exception as e:
+            logger.warning("Failed to send webhook notification: %s", str(e))
 
         return jsonify({
             'success': True,

@@ -17,6 +17,7 @@ from backend.extensions import limiter
 from backend.api.v1.books import books_v1
 from backend.api.v1.users import users_v1
 from backend.api.v1.borrows import borrows_v1
+from backend.api.v1.webhooks import webhooks_v1
 
 # Import V2 API blueprints
 from backend.api.v2.books import books_v2
@@ -154,6 +155,10 @@ def create_app():
                 "description": "API V1 - Quản lý mượn trả sách (Client-Server)"
             },
             {
+                "name": "V1 - Webhooks",
+                "description": "API V1 - Quản lý webhook notifications"
+            },
+            {
                 "name": "V2 - Books (Uniform Interface)",
                 "description": "API V2 - Quản lý sách với HATEOAS"
             },
@@ -194,6 +199,7 @@ def create_app():
     app.register_blueprint(books_v1)
     app.register_blueprint(users_v1)
     app.register_blueprint(borrows_v1)
+    app.register_blueprint(webhooks_v1)
     
     # Register V2 API blueprints
     app.register_blueprint(books_v2)
@@ -301,8 +307,10 @@ def create_app():
                         'books': '/api/v1/books',
                         'users': '/api/v1/users',
                         'borrows': '/api/v1/borrows',
-                        'auth': '/api/v1/auth/login'
-                    }
+                        'auth': '/api/v1/auth/login',
+                        'webhooks': '/api/v1/webhooks'
+                    },
+                    'features': ['Webhook notifications for book events']
                 },
                 'v2': {
                     'status': 'active',

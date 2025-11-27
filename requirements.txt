@@ -6,3 +6,4 @@ Flask-Caching>=2.1.0
 flasgger>=0.9.7
 prometheus-client>=0.20.0
 Flask-Limiter>=3.5.0
+requests>=2.31.0
