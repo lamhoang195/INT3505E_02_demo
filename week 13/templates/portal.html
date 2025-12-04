@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <title>Library Payment API – Developer Portal</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1080px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 16px 45px rgba(15, 23, 42, 0.35);
+            padding: 24px 28px 28px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 14px;
+        }
+
+        h1 {
+            font-size: 26px;
+            color: #1f2933;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #eef2ff;
+            color: #4338ca;
+            border: 1px solid #c7d2fe;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .card {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 16px 18px;
+        }
+
+        .card h2 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #1d4ed8;
+        }
+
+        ul {
+            padding-left: 18px;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        ul li + li {
+            margin-top: 4px;
+        }
+
+        .section {
+            margin-top: 18px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        pre {
+            background: #020617;
+            color: #e5e7eb;
+            border-radius: 10px;
+            padding: 12px 14px;
+            overflow-x: auto;
+            font-size: 13px;
+            border: 1px solid #1f2937;
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        .muted {
+            color: #6b7280;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .kpi-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 4px;
+            font-size: 13px;
+        }
+
+        .kpi-pill {
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #ecfdf5;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Library Payment API – Developer Portal</h1>
+                <p class="subtitle">
+                    Demo buổi 13: API as a Product – Business model canvas + Developer experience.
+                </p>
+            </div>
+            <span class="pill">v1 · Public Beta</span>
+        </div>
+
+        <div class="section">
+            <div class="section-title">KPIs sản phẩm (demo)</div>
+            <div class="kpi-row">
+                <span class="kpi-pill">120+ developers đăng ký</span>
+                <span class="kpi-pill">150.000 calls / tháng</span>
+                <span class="kpi-pill">Error rate ~0.4%</span>
+            </div>
+        </div>
+
+        <div class="section grid">
+            <div class="card">
+                <h2>Value Proposition</h2>
+                <ul>
+                    <li>Tích hợp thanh toán mượn sách trong vài phút.</li>
+                    <li>Báo cáo giao dịch &amp; thống kê lỗi theo thời gian thực.</li>
+                    <li>SDK / tài liệu rõ ràng, giảm thời gian tích hợp.</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h2>Customer Segments</h2>
+                <ul>
+                    <li>Trường đại học &amp; thư viện công cộng.</li>
+                    <li>Startup xây app quản lý thư viện.</li>
+                    <li>Các sản phẩm quản lý mượn trả sách nội bộ.</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h2>Revenue Streams</h2>
+                <ul>
+                    <li>Freemium: 10.000 API calls / tháng miễn phí.</li>
+                    <li>Pay-per-call: 0.001 USD / call sau free tier.</li>
+                    <li>Hợp đồng enterprise cho khách hàng lớn.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Quickstart</div>
+            <p class="muted">Gọi thử một endpoint đơn giản để lấy thông tin sản phẩm API dưới dạng JSON.</p>
+            <pre><code>GET /api/info
+Host: localhost:5013
+
+curl http://localhost:5013/api/info</code></pre>
+            <p class="muted">
+                Bạn có thể thay đổi JSON trả về trong <code>week 13/app.py</code> để mô phỏng business model canvas
+                cho API nhóm bạn đang làm.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+
+
